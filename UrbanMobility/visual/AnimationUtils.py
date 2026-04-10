@@ -1,5 +1,5 @@
 from matplotlib import pyplot as plt
-from utils.UrbanUtils import *
+import numpy as np
 import agentpy as ap
 
 
