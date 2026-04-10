@@ -1,7 +1,12 @@
-from model.AgentImpl import *
+from model.AgentImpl import AstarDriver, AstarWalker
 from model.AgentSpawner import AgentSpawner
 from model.MetricsCollector import MetricsCollector
-from utils.UrbanUtils import *
+from utils.UrbanUtils import (
+    euclidean,
+    get_driver_endpoints,
+    get_parking_spots,
+    get_walker_endpoints,
+)
 import agentpy as ap, numpy as np
 
 
