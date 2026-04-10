@@ -1,6 +1,11 @@
 # %% [markdown]
 # # Pedestrians routes
 #
+# Note: This is a comprehensive, scenario-rich notebook that overlaps with the
+# focused examples in `notebooks/01_...` through `notebooks/05_...`.
+# Use the numbered notebooks for targeted workflows, and this one as an
+# end-to-end exploratory walkthrough.
+#
 # This code snippet demonstrates a minimal agent-based simulation of pedestrian movement using weighted decision-making. Each pedestrian agent is characterized by two key parameters: risk weight and maximum speed. These parameters influence how agents choose paths and move through the environment.
 #
 # **Walker Agent Parameters**: Agents can be initialized using exact coordinates (start and goal) to simulate specific situations. In this case, the *walkers* parameter contains specific data for each agent:
@@ -15,7 +20,14 @@ from pathlib import Path
 import sys
 import os
 
-ROOT = Path(__file__).resolve().parents[1]
+# Support both script execution and interactive notebook execution.
+if "__file__" in globals():
+    ROOT = Path(__file__).resolve().parents[1]
+else:
+    ROOT = Path.cwd()
+    if not (ROOT / "services").exists() and (ROOT.parent / "services").exists():
+        ROOT = ROOT.parent
+
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
