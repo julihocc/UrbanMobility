@@ -67,14 +67,46 @@ Start with [UrbanSimulation.ipynb](./UrbanSimulation.ipynb). It is the best entr
 
 This is the recommended path if you want a reproducible walkthrough of the model and its outputs.
 
+Notebook exploration should call helpers from [notebooks_support/helpers.py](./notebooks_support/helpers.py):
+
+- run_exploration(parameters, include_heatmaps=False) for executing simulation runs from notebook cells.
+- summarize_metrics(result) for quick metric summaries without manually traversing nested dictionaries.
+
 ### Python scripts
 
 The repository also includes script-based examples:
 
-- [main.py](./main.py) shows how to configure a seeded city, generate obstacles and potholes, run `CityModel`, and produce heatmap-oriented outputs.
-- [Reporting.py](./Reporting.py) shows how to build small experiment sweeps by varying parameters across multiple runs.
+- [main.py](./main.py) shows how to configure a seeded city, run the application service, and produce heatmap-oriented outputs.
+- [Reporting.py](./Reporting.py) shows how to build small experiment sweeps by varying parameters across multiple runs through the service layer.
 
 These files are useful references when moving notebook logic into reusable Python code.
+
+### Application service API
+
+Use [services/simulation_service.py](./services/simulation_service.py) as the execution boundary between domain logic and interfaces:
+
+- run_simulation(config, model_cls=CityModel, include_heatmaps=False)
+- run_simulation_from_parameters(parameters, model_cls=CityModel, include_heatmaps=False)
+
+Both functions return [contracts/simulation_result.py](./contracts/simulation_result.py) SimulationResult objects.
+
+### Result contract and serialization
+
+[contracts/simulation_result.py](./contracts/simulation_result.py) provides a transport-friendly output object for scripts, notebook cells, and GUI controllers.
+
+- to_dict(include_metrics=True, include_spawned_agents=True, include_heatmaps=True)
+- to_json(include_metrics=True, include_spawned_agents=True, include_heatmaps=True, indent=2)
+
+The serializer normalizes nested values to builtin JSON-friendly structures to simplify persistence and external integration.
+
+### GUI adapter boundary
+
+[gui/controller.py](./gui/controller.py) and [gui/renderers.py](./gui/renderers.py) provide a minimal adapter interface for frontends:
+
+- SimulationController executes runs and stores last_result.
+- GuiRenderer defines rendering contracts for successful runs and errors.
+
+This keeps GUI concerns outside domain and application layers.
 
 ## Model Concepts
 
@@ -101,3 +133,10 @@ The codebase now follows a lightweight layered structure:
 - Application services: `services/` provides run use-cases for scripts, GUI, and notebooks.
 - Contracts: `contracts/` defines result objects and serialization boundaries.
 - Adapters: `visual/`, `gui/`, and `notebooks_support/` consume service outputs for different user interfaces.
+
+Recommended dependency direction:
+
+- model -> no dependency on services, gui, notebooks_support.
+- services -> depends on model and contracts.
+- adapters (visual, gui, notebooks_support) -> depend on services and contracts.
+- entrypoints (main, Reporting, notebooks) -> depend on adapters and services, not directly on low-level model internals unless required for experimentation.
