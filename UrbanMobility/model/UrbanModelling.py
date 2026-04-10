@@ -1,4 +1,5 @@
 from model.AgentImpl import *
+from model.AgentSpawner import AgentSpawner
 from model.MetricsCollector import MetricsCollector
 from utils.UrbanUtils import *
 import agentpy as ap, numpy as np
@@ -22,23 +23,9 @@ class CityModel(ap.Model):
         self.spawned_agents = {}
         self.repopulate = False if "repopulate" not in self.p else self.p.repopulate
 
-        # TODO: Riks penalization for agent. Also may change with a p parameter
-        # Initializing agents (walkers & drivers)
-        self.walker_weight = (
-            self.p.walker_weight if "walker_weight" in self.p else lambda: 1
-        )
-        self.driver_weight = (
-            self.p.driver_weight if "driver_weight" in self.p else lambda: 1
-        )
-        self.walker_maxspeed = (
-            self.p.walker_maxspeed if "walker_maxspeed" in self.p else lambda: 10
-        )
-        self.driver_maxspeed = (
-            self.p.driver_maxspeed
-            if "driver_maxspeed" in self.p
-            else lambda: MobileAgent.SPEED_LIMIT
-        )
-        self.setup_initial_agents()
+        self.spawner = AgentSpawner(self, self.city)
+        self.nwalkers, self.ndrivers = self.spawner.setup_initial_agents()
+        self.spawned_agents = self.spawner.spawned_agents
 
         self.metrics_collector = MetricsCollector(self.city, self.removal_times)
 
@@ -63,188 +50,6 @@ class CityModel(ap.Model):
         drive_move = ["fw", "rt", "lt", "ch", "ft", "bw"]
         self.drive_risk = dict(zip(drive_move, [0, 1, 2, 10, 10, 15]))
 
-    # Initialize agents according to parameter. If a full description for initial agents is given, it adds these agents.
-    # Otherwise, a random configuration is created
-    def setup_initial_agents(self):
-        if "walkers" not in self.p:
-            self.nwalkers = (
-                self.p.initial_walker_count if "initial_walker_count" in self.p else 0
-            )
-            self.spawn_walkers(self.nwalkers)
-        else:
-            agents = []
-            self.nwalkers = len(self.p.walkers)
-            default_vals = {
-                "max_speed": 10,
-                "visibility": 3,
-                "awareness": 1,
-                "weight": 1,
-                "direction": self.random.choice([(0, 1), (0, -1), (1, 0), (-1, 0)]),
-            }
-            for walker in self.p.walkers:
-                d, s, v, w, a = [
-                    walker[key] if key in walker else default_vals[key]
-                    for key in (
-                        "direction",
-                        "max_speed",
-                        "visibility",
-                        "weight",
-                        "awareness",
-                    )
-                ]
-                start = walker["start"]
-                position = tuple(
-                    start[i] + self.random.uniform(0.1, 0.9) for i in (0, 1)
-                )
-                agent = AstarWalker(
-                    self,
-                    position,
-                    walker["goal"],
-                    direction=d,
-                    speed=s,
-                    visibility=v,
-                    awareness=a,
-                    weight=w,
-                )
-                agents.append(agent)
-                self.city.add_agents([agent], positions=[start])
-                agent.find_route()
-                self.spawned_agents[agent.id] = {
-                    "start": agent.start,
-                    "goal": agent.goal,
-                    "type": agent.type,
-                    "spawn_time": self.t,
-                    "max_speed": agent.max_speed,
-                }
-            [agent.initialize_agent() for agent in agents]
-
-        if "drivers" not in self.p:
-            self.ndrivers = (
-                self.p.initial_driver_count if "initial_driver_count" in self.p else 0
-            )
-            self.spawn_drivers(self.ndrivers, sources=self.city.road_cells)
-        else:
-            agents = []
-            self.ndrivers = len(self.p.drivers)
-            default_vals = {
-                "max_speed": 60,
-                "visibility": 5,
-                "awareness": 1,
-                "weight": 1,
-            }
-            for driver in self.p.drivers:
-                s, v, w, a = [
-                    driver[key] if key in driver else default_vals[key]
-                    for key in ("max_speed", "visibility", "weight", "awareness")
-                ]
-                start = driver["start"]
-                if "direction" not in driver.keys():
-                    ways, dict = (
-                        self.city.city_grid[start][1:].strip(),
-                        MobileAgent.ACTION_MAP,
-                    )
-                    driver["direction"] = (
-                        dict[self.random.choice("NSEW")]
-                        if ways == ""
-                        else dict[self.random.choice(ways)]
-                    )
-                position = tuple(
-                    start[i] + self.random.uniform(0.4, 0.6) for i in (0, 1)
-                )
-                agent = AstarDriver(
-                    self,
-                    position,
-                    driver["goal"],
-                    driver["direction"],
-                    speed=s,
-                    visibility=v,
-                    awareness=a,
-                    weight=w,
-                )
-                agents.append(agent)
-                self.city.add_agents([agent], positions=[start])
-                # positions.append(start), agents.append(agent)
-                agent.find_route()
-                self.spawned_agents[agent.id] = {
-                    "start": agent.start,
-                    "goal": agent.goal,
-                    "type": agent.type,
-                    "spawn_time": self.t,
-                    "max_speed": agent.max_speed,
-                }
-            [agent.initialize_agent() for agent in agents]
-
-    # Pedestrians will be spawned from sidewalks, simulating leaving a building
-    def spawn_walkers(self, n):
-        # List of pedestrians and its positions
-        agents, pos = [], []
-        for i in range(n):
-            # Random start and goal in any position with a sidewalk
-            start = list(self.random.choice(self.city.walker_sources))
-            position = (
-                start[0] + self.random.uniform(0.1, 0.9),
-                start[1] + self.random.uniform(0.1, 0.9),
-            )
-            goal = self.random.choice(self.city.walker_goals)
-            direction = self.random.choice([(0, 1), (0, -1), (1, 0), (-1, 0)])
-            weight = self.walker_weight()
-            speed = self.walker_maxspeed()
-            agent = AstarWalker(
-                self, position, goal, direction=direction, speed=speed, weight=weight
-            )
-            pos.append(start)
-            agents.append(agent)
-        self.city.add_agents(agents, positions=pos)
-        [agent.find_route() for agent in agents]
-        [agent.initialize_agent() for agent in agents]
-        for agent in agents:
-            self.spawned_agents[agent.id] = {
-                "start": agent.start,
-                "goal": agent.goal,
-                "type": agent.type,
-                "spawn_time": self.t,
-                "max_speed": agent.max_speed,
-            }
-
-    # Cars will be spawned from street edges
-    def spawn_drivers(self, n, sources=None):
-        # List of cars and its positions
-        agents, pos, rnd, city = [], [], self.random, self.city
-        # I f no sources give, use default given in parameters
-        sources = city.driver_sources[:] if sources is None else sources
-        sources = list(set(sources).difference(city.positions.values()))
-        for i in range(n):
-            # Random start and goal in any position with a sidewalk
-            start = rnd.choice(sources)
-            goal = rnd.choice(city.driver_goals)
-            pos.append(start)
-            position = (start[0] + 0.5, start[1] + 0.5)
-            # Avoid very short distances
-            while manhattan(goal, start) < 10:
-                goal = rnd.choice(city.driver_goals)
-            weight = self.driver_weight()
-            speed = self.driver_maxspeed()
-            ways, dict = city.city_grid[start][1:].strip(), MobileAgent.ACTION_MAP
-            direction = (
-                dict[rnd.choice("NSEW")] if ways == "" else dict[rnd.choice(ways)]
-            )
-            agent = AstarDriver(
-                self, position, goal, direction=direction, speed=speed, weight=weight
-            )
-            agents.append(agent)
-            sources.remove(start)
-        city.add_agents(agents, positions=pos)
-        [agent.find_route() for agent in agents]
-        [agent.initialize_agent() for agent in agents]
-        for agent in agents:
-            self.spawned_agents[agent.id] = {
-                "start": agent.start,
-                "goal": agent.goal,
-                "type": agent.type,
-                "spawn_time": self.t,
-                "max_speed": agent.max_speed,
-            }
-
     def update(self):
         # Update and collect metrics at time t
         self.metrics[self.t] = {}
@@ -256,14 +61,14 @@ class CityModel(ap.Model):
 
         # Spawning walkers and drivers to match initial count
         if self.repopulate:
-            active_walkers = filter(
-                lambda x: x.agent_type == "walker" and x.active, self.city.agents
+            active_walkers = sum(
+                1 for a in self.city.agents if a.agent_type == "walker" and a.active
             )
-            self.spawn_walkers(self.nwalkers - len(list(active_walkers)))
-            active_drivers = filter(
-                lambda x: x.agent_type == "driver" and x.active, self.city.agents
+            self.spawner.spawn_walkers(self.nwalkers - active_walkers)
+            active_drivers = sum(
+                1 for a in self.city.agents if a.agent_type == "driver" and a.active
             )
-            self.spawn_drivers(self.ndrivers - len(list(active_drivers)))
+            self.spawner.spawn_drivers(self.ndrivers - active_drivers)
 
         # Manages goal reaching agents.
         self.goal_agents()
@@ -691,10 +496,10 @@ class PoisonCityModel(CityModel):
         )
         N = self.p.initial_walker_count - cur_nwalkers
         n = 0 if N < 0 else max(0, np.random.poisson(N))
-        self.spawn_walkers(n)
+        self.spawner.spawn_walkers(n)
         N = self.p.initial_driver_count - cur_ndrivers
         n = 0 if N < 0 else max(0, np.random.poisson(N))
-        self.spawn_drivers(n)
+        self.spawner.spawn_drivers(n)
 
         # Manages goal reaching agents.
         self.goal_agents()
