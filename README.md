@@ -21,6 +21,10 @@ The main project code lives at the repository root:
 - [UrbanSimulation.ipynb](./UrbanSimulation.ipynb): primary walkthrough for running and visualizing simulations.
 - [main.py](./main.py): example seeded simulation setup for a single run.
 - [Reporting.py](./Reporting.py): experiment-style script for parameter sweeps.
+- [contracts/simulation_result.py](./contracts/simulation_result.py): result contract with JSON-friendly serialization.
+- [services/simulation_service.py](./services/simulation_service.py): application service boundary for running simulations.
+- [gui/controller.py](./gui/controller.py): GUI adapter skeleton that coordinates service calls and rendering.
+- [notebooks_support/helpers.py](./notebooks_support/helpers.py): notebook-focused wrappers and metric summaries.
 - [model/UrbanModelling.py](./model/UrbanModelling.py): `CityModel` orchestration, agent lifecycle, and metrics collection.
 - [model/AgentBase.py](./model/AgentBase.py): base classes and shared agent behavior.
 - [model/AgentImpl.py](./model/AgentImpl.py): concrete pedestrian and driver implementations.
@@ -88,3 +92,12 @@ The project already uses seeded randomness in its main simulation entrypoint. Fo
 ## Current State
 
 This repository is best treated as a simulation and analysis workspace rather than a packaged Python library. The notebook and source files document the intended workflow, while scripts serve as concrete examples for extending experiments and analysis.
+
+## Separation of Concerns
+
+The codebase now follows a lightweight layered structure:
+
+- Domain logic: `model/` contains simulation rules and state transitions.
+- Application services: `services/` provides run use-cases for scripts, GUI, and notebooks.
+- Contracts: `contracts/` defines result objects and serialization boundaries.
+- Adapters: `visual/`, `gui/`, and `notebooks_support/` consume service outputs for different user interfaces.
