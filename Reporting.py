@@ -1,6 +1,6 @@
 from SimulationConfig import SimulationConfig
-from model.UrbanModelling import CityModel
 import numpy as np
+from services.simulation_service import run_simulation_from_parameters
 
 from utils.UrbanUtils import gen_city, gen_obstacles
 
@@ -28,8 +28,7 @@ def build_parameter_sweep():
 
 def main():
     for parameters in build_parameter_sweep():
-        model = CityModel(parameters)
-        model.run()
+        run_simulation_from_parameters(parameters)
 
 
 if __name__ == "__main__":

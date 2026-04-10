@@ -1,8 +1,8 @@
 import random
 
 from SimulationConfig import SimulationConfig
-from model.UrbanModelling import CityModel
-from utils.Reporting import load_heatmaps, generate_heatmaps
+from services.simulation_service import run_simulation
+from utils.Reporting import generate_heatmaps
 from utils.UrbanUtils import gen_city, gen_obstacles
 
 
@@ -34,10 +34,8 @@ def main():
         display=False,
     )
 
-    model = CityModel(config.to_parameters())
-    model.run()
-    heatmaps = load_heatmaps(model)
-    generate_heatmaps(model.city, heatmaps, figsize=(12, 10))
+    result = run_simulation(config, include_heatmaps=True)
+    generate_heatmaps(result.city, result.heatmaps, figsize=(12, 10))
 
 
 if __name__ == "__main__":
