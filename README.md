@@ -21,6 +21,7 @@ The main project code lives at the repository root:
 - [UrbanSimulation.ipynb](./UrbanSimulation.ipynb): primary walkthrough for running and visualizing simulations.
 - [main.py](./main.py): example seeded simulation setup for a single run.
 - [Reporting.py](./Reporting.py): experiment-style script for parameter sweeps.
+- [notebooks](./notebooks): focused examples for quickstart, sweeps, visualization, serialization, and GUI adapter usage.
 - [contracts/simulation_result.py](./contracts/simulation_result.py): result contract with JSON-friendly serialization.
 - [services/simulation_service.py](./services/simulation_service.py): application service boundary for running simulations.
 - [gui/controller.py](./gui/controller.py): GUI adapter skeleton that coordinates service calls and rendering.
@@ -71,6 +72,16 @@ Notebook exploration should call helpers from [notebooks_support/helpers.py](./n
 
 - run_exploration(parameters, include_heatmaps=False) for executing simulation runs from notebook cells.
 - summarize_metrics(result) for quick metric summaries without manually traversing nested dictionaries.
+
+### Notebook catalog
+
+Additional library-oriented examples are available in [notebooks](./notebooks):
+
+- [notebooks/01_quickstart_service.ipynb](./notebooks/01_quickstart_service.ipynb): service-layer quickstart with `SimulationConfig`.
+- [notebooks/02_parameter_sweep.ipynb](./notebooks/02_parameter_sweep.ipynb): compact parameter sweep with summarized outputs.
+- [notebooks/03_heatmaps_and_visualization.ipynb](./notebooks/03_heatmaps_and_visualization.ipynb): heatmap generation and visualization adapter usage.
+- [notebooks/04_result_serialization.ipynb](./notebooks/04_result_serialization.ipynb): `SimulationResult` to dict/JSON export patterns.
+- [notebooks/05_gui_adapter_pattern.ipynb](./notebooks/05_gui_adapter_pattern.ipynb): GUI controller and renderer integration pattern.
 
 ### Python scripts
 
