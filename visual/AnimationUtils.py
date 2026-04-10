@@ -25,8 +25,9 @@ def animation_plot(model, ax, alpha="80"):
 def plot_collisions(metrics, ax):
     T = max(metrics.keys())
     for t in range(max(0, T - 10), T):
-        if "collisions" in metrics[t].keys():
-            for collision in metrics[t]["collisions"]:
+        step_metrics = metrics.get(t, {})
+        if "collisions" in step_metrics.keys():
+            for collision in step_metrics["collisions"]:
                 ax.text(
                     collision[1] - 1.25,
                     collision[0],
@@ -34,14 +35,16 @@ def plot_collisions(metrics, ax):
                     fontsize=30,
                     color="red",
                 )
-        if "runovers" in metrics[t].keys():
-            for runover in metrics[t]["runovers"]:
+        if "runovers" in step_metrics.keys():
+            for runover in step_metrics["runovers"]:
                 ax.text(
                     runover[1] - 1.25, runover[0], "\u2739", fontsize=30, color="red"
                 )
 
-    ncollisions = sum([len(metrics[t]["collisions"]) for t in range(0, T)])
-    nrunovers = sum([len(metrics[t]["runovers"]) for t in range(0, T)])
+    ncollisions = sum(
+        [len(metrics.get(t, {}).get("collisions", [])) for t in range(0, T)]
+    )
+    nrunovers = sum([len(metrics.get(t, {}).get("runovers", [])) for t in range(0, T)])
     ax.set_title(
         "t: {}, runovers: {}, collisions: {}".format(T, nrunovers, ncollisions)
     )
