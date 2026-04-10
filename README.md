@@ -140,3 +140,75 @@ Recommended dependency direction:
 - services -> depends on model and contracts.
 - adapters (visual, gui, notebooks_support) -> depend on services and contracts.
 - entrypoints (main, Reporting, notebooks) -> depend on adapters and services, not directly on low-level model internals unless required for experimentation.
+
+## Migration Checklist
+
+Use this checklist when updating legacy scripts or notebook cells.
+
+### 1) Replace direct model execution
+
+Before:
+
+```python
+from model.UrbanModelling import CityModel
+
+model = CityModel(parameters)
+model.run()
+```
+
+After:
+
+```python
+from services import run_simulation_from_parameters
+
+result = run_simulation_from_parameters(parameters)
+```
+
+### 2) Replace notebook cell orchestration
+
+Before:
+
+```python
+from model import CityModel
+
+model = CityModel(parameters)
+model.run()
+```
+
+After:
+
+```python
+from notebooks_support import run_exploration, summarize_metrics
+
+result = run_exploration(parameters)
+print(summarize_metrics(result))
+```
+
+### 3) Keep visualization as an adapter
+
+- Continue using [visual/AnimationUtils.py](./visual/AnimationUtils.py) for rendering only.
+- Pass service results to visual routines, for example `result.model` or `result.heatmaps`.
+- Avoid placing simulation rules in plotting functions.
+
+### 4) Use SimulationResult for data exchange
+
+- Use `result.metrics`, `result.spawned_agents`, and `result.heatmaps` from [contracts/simulation_result.py](./contracts/simulation_result.py).
+- Use `result.to_dict()` or `result.to_json()` when exporting results to files, APIs, or GUI layers.
+
+### 5) Migrate script entrypoints
+
+- Keep configuration in [SimulationConfig.py](./SimulationConfig.py).
+- Use `run_simulation(config, include_heatmaps=...)` in [main.py](./main.py)-style workflows.
+- Use `run_simulation_from_parameters(parameters)` in [Reporting.py](./Reporting.py)-style sweeps.
+
+### 6) Migrate GUI integrations
+
+- Use [gui/controller.py](./gui/controller.py) as the frontend entrypoint.
+- Implement a [gui/renderers.py](./gui/renderers.py) `GuiRenderer` for your framework (Qt, Tkinter, web bridge, etc.).
+- Keep GUI framework code out of domain and services layers.
+
+### 7) Verify migration safety
+
+- Run a fixed-seed scenario before and after migration.
+- Compare key outputs: arrivals, collisions, runovers, and heatmaps.
+- Keep parameter names and defaults aligned between scripts and notebooks.
