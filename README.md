@@ -16,19 +16,19 @@ The simulation models:
 
 ## Repository Layout
 
-The main project code lives under [UrbanMobility](./UrbanMobility):
+The main project code lives at the repository root:
 
-- [UrbanMobility/UrbanSimulation.ipynb](./UrbanMobility/UrbanSimulation.ipynb): primary walkthrough for running and visualizing simulations.
-- [UrbanMobility/main.py](./UrbanMobility/main.py): example seeded simulation setup for a single run.
-- [UrbanMobility/Reporting.py](./UrbanMobility/Reporting.py): experiment-style script for parameter sweeps.
-- [UrbanMobility/model/UrbanModelling.py](./UrbanMobility/model/UrbanModelling.py): `CityModel` orchestration, agent lifecycle, and metrics collection.
-- [UrbanMobility/model/AgentBase.py](./UrbanMobility/model/AgentBase.py): base classes and shared agent behavior.
-- [UrbanMobility/model/AgentImpl.py](./UrbanMobility/model/AgentImpl.py): concrete pedestrian and driver implementations.
-- [UrbanMobility/utils/UrbanUtils.py](./UrbanMobility/utils/UrbanUtils.py): grid generation, obstacles, heuristics, and weighted A* utilities.
-- [UrbanMobility/visual/AnimationUtils.py](./UrbanMobility/visual/AnimationUtils.py): visualization helpers.
-- [UrbanMobility/images](./UrbanMobility/images): generated or referenced visual assets.
+- [UrbanSimulation.ipynb](./UrbanSimulation.ipynb): primary walkthrough for running and visualizing simulations.
+- [main.py](./main.py): example seeded simulation setup for a single run.
+- [Reporting.py](./Reporting.py): experiment-style script for parameter sweeps.
+- [model/UrbanModelling.py](./model/UrbanModelling.py): `CityModel` orchestration, agent lifecycle, and metrics collection.
+- [model/AgentBase.py](./model/AgentBase.py): base classes and shared agent behavior.
+- [model/AgentImpl.py](./model/AgentImpl.py): concrete pedestrian and driver implementations.
+- [utils/UrbanUtils.py](./utils/UrbanUtils.py): grid generation, obstacles, heuristics, and weighted A* utilities.
+- [visual/AnimationUtils.py](./visual/AnimationUtils.py): visualization helpers.
+- [images](./images): generated or referenced visual assets.
 
-![UrbanMobility](./UrbanMobility/images/UrbanModel.gif)
+![UrbanMobility](./images/UrbanModel.gif)
 
 ## Environment Setup
 
@@ -53,7 +53,7 @@ python -m pip install agentpy numpy matplotlib jupyter
 
 ### Notebook-first workflow
 
-Start with [UrbanMobility/UrbanSimulation.ipynb](./UrbanMobility/UrbanSimulation.ipynb). It is the best entrypoint for understanding:
+Start with [UrbanSimulation.ipynb](./UrbanSimulation.ipynb). It is the best entrypoint for understanding:
 
 - city generation
 - agent initialization
@@ -67,8 +67,8 @@ This is the recommended path if you want a reproducible walkthrough of the model
 
 The repository also includes script-based examples:
 
-- [UrbanMobility/main.py](./UrbanMobility/main.py) shows how to configure a seeded city, generate obstacles and potholes, run `CityModel`, and produce heatmap-oriented outputs.
-- [UrbanMobility/Reporting.py](./UrbanMobility/Reporting.py) shows how to build small experiment sweeps by varying parameters across multiple runs.
+- [main.py](./main.py) shows how to configure a seeded city, generate obstacles and potholes, run `CityModel`, and produce heatmap-oriented outputs.
+- [Reporting.py](./Reporting.py) shows how to build small experiment sweeps by varying parameters across multiple runs.
 
 These files are useful references when moving notebook logic into reusable Python code.
 
