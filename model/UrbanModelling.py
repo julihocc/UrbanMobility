@@ -194,4 +194,9 @@ class City(ap.Grid):
 
 # Backward compatibility for existing imports:
 # from model.UrbanModelling import PoisonCityModel
-from model.PoisonCityModel import PoisonCityModel  # noqa: E402
+def __getattr__(name):
+    if name == "PoisonCityModel":
+        from model.PoisonCityModel import PoisonCityModel
+
+        return PoisonCityModel
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
