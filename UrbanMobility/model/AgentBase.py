@@ -203,7 +203,6 @@ class AstarAgent(MobileAgent):
 
     # Get a list of instructions self.instructions to achieve the goal. A small list of next positions will update at each step to simulate visibility
     def find_route(self, grid = None):
-        #route = weighted_astar_agent(self, self.grid_position(), self.goal, MobileAgent.INSTRUCTION_MAP, grid=grid, heuristic=manhattan, weight=self.weight)
         self.align_to_cell()
         grid = grid if grid is not None else self.city.city_grid
         route = weighted_astar(self.grid_position(), self.goal, grid=grid, step_cost=self.step_cost, step_risk=self.step_risk, weight=self.weight)

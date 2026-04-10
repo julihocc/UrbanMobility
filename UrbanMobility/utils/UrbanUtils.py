@@ -12,54 +12,6 @@ def euclidean(a, b):
 # A weighted A* implementation considering an urban codification with a grid.
 # Cell types have an inherent cost according to the cell type and action.
 ######################################################
-def weighted_astar_agent(agent, start, goal, action_dir, grid, heuristic = manhattan, weight=1):
-    # Custom grid. It may be modified to add dynamic environment elemnts, e.g., potholes or damaged cars
-    if grid is None:
-        grid = agent.city.city_grid
-    rows, cols = grid.shape
-
-    # Veirifies if the action is within the square
-    def in_bounds(x, y):
-        return 0 <= x < rows and 0 <= y < cols
-
-    # Initializing A* algorithm. The heap stores visited current and estimated distance (f, g) and current node
-    open_set = []
-    heapq.heappush(open_set, (0 + weight * heuristic(start, goal), 0, start))  # (f, g, node)
-
-    came_from = {}
-    cost_so_far = {start: (0, agent.direction)}
-
-    while open_set:
-        _, current_g, current = heapq.heappop(open_set)
-
-        if current == goal:
-            # Get instructions from path
-            route = [current]
-            while current in came_from:
-                cfrom = came_from[current]
-                route.append(cfrom)
-                current = came_from[current]
-            return route[::-1]
-
-        for a in action_dir.keys():
-            dx, dy = action_dir[a]
-            next_node = current[0] + dx, current[1] + dy
-            if in_bounds(next_node[0], next_node[1]):
-                c, agent.direction = cost_so_far[current]
-                new_cost = c + agent.step_cost(next_node) + agent.step_risk(a, current)
-                if next_node not in cost_so_far or new_cost < cost_so_far[next_node][0]:
-                    cost_so_far[next_node] = (new_cost, (dx, dy))
-                    priority = new_cost + weight * heuristic(next_node, goal)
-                    heapq.heappush(open_set, (priority, new_cost, next_node))
-                    came_from[next_node] = current
-
-
-    return None  # No path found
-
-######################################################
-# A weighted A* implementation considering an urban codification with a grid.
-# Cell types have an inherent cost according to the cell type and action.
-######################################################
 def weighted_astar(start, goal, grid, step_cost, step_risk, heuristic = manhattan, weight=1):
     # Mapping directions from actions for simplicity
     actions = ['N', 'S', 'E', 'W']
