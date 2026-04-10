@@ -509,7 +509,7 @@ def plot_next(city_grid, ax, agents, cmap=[]):
 
 
 if __name__ == "__main__":
-    from model.UrbanModelling import PoisonCityModel
+    from model import PoisonCityModel
 
     seed = 0
     wspawn = lambda n: max(0, np.random.poisson(n))

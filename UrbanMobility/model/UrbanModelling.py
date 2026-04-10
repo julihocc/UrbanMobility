@@ -117,54 +117,6 @@ class CityModel(ap.Model):
 #####################################
 
 #######################################
-# CLASS FOR RANDOM AGENT GENERATION -- FOR SIMULATION PURPOSES
-#######################################
-class PoisonCityModel(CityModel):
-    def update(self):
-        # Update and collect metrics at time t
-        self.metrics[self.t] = {}
-
-        # Remove any agents scheduled for removal
-        if self.scheduled_removals:
-            self.city.remove_agents(self.scheduled_removals)
-            self.scheduled_removals = []
-
-        # Spawning walkers and drivers per step
-        cur_nwalkers = len(
-            list(filter(lambda x: x.agent_type == "walker", self.city.agents))
-        )
-        cur_ndrivers = len(
-            list(filter(lambda x: x.agent_type == "driver", self.city.agents))
-        )
-        N = self.p.initial_walker_count - cur_nwalkers
-        n = 0 if N < 0 else max(0, np.random.poisson(N))
-        self.spawner.spawn_walkers(n)
-        N = self.p.initial_driver_count - cur_ndrivers
-        n = 0 if N < 0 else max(0, np.random.poisson(N))
-        self.spawner.spawn_drivers(n)
-
-        # Manages goal reaching agents.
-        self.goal_agents()
-
-        # Sense-react-decide cycle.
-        self.city.agents.sense()
-        self.city.agents.react()
-        self.city.agents.choose_action()
-
-        # Monitoring metrics
-        self.report_metrics()
-
-        # Verifies if every driver has stopped and finish simulation
-        # if self.metrics[self.t]['avg_speed_drivers'] < 1:
-        #     from matplotlib import pyplot as plt
-        #     fig = plt.figure(figsize=(10, 10))
-        #     ax = fig.add_subplot(111)
-        #     animation_plot(self, ax)
-        #     plt.show()
-        #     self.stop()
-
-
-#######################################
 # CLASS FOR ENVIRONMENT
 #######################################
 """
@@ -234,3 +186,7 @@ class City(ap.Grid):
         # Car will be spawned from street intersections on edges. These will also work as goals
         return get_driver_endpoints(self.city_grid)
 
+
+# Backward compatibility for existing imports:
+# from model.UrbanModelling import PoisonCityModel
+from model.PoisonCityModel import PoisonCityModel  # noqa: E402
