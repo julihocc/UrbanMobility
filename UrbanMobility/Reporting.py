@@ -1,26 +1,36 @@
-from UrbanModelling import CityModel
-from UrbanUtils import *
-from agentpy import Experiment
+from SimulationConfig import SimulationConfig
+from model.UrbanModelling import CityModel
 import numpy as np
 
-#
-city_grid = gen_city(block_shape = (15, 15), city_shape=(3, 3), street_parking=True, crop = 4)
-# Focusing on pedestrians. Increase number of obstacles in sidewalks
-parameters = [{
-        'seed': 0,
-        'debug': False,
-        'city_grid': city_grid,
-        'initial_walker_count': 10,
-        'initial_driver_count': 10,
-        'obstacles': gen_obstacles(city_grid, obstacles = o)[0],
-        'max_walker_spawn': 1,
-        'max_driver_spawn': 1,
-        'steps': 50,
-        'display': False
-    } for o in np.linspace(0, .2, 11)]
+from utils.UrbanUtils import gen_city, gen_obstacles
 
-for p in parameters:
-    model = CityModel(p).run()
-    model.run()
-#output1 = Experiment(CityModel, sample = parameters).run(n_jobs=-1)
-#output2 = Experiment(CityModel, sample = parameters, record = True).run(n_jobs=-1)
+
+def build_parameter_sweep():
+    city_grid = gen_city(
+        block_shape=(15, 15), city_shape=(3, 3), street_parking=True, crop=4
+    )
+    return [
+        SimulationConfig(
+            seed=0,
+            debug=False,
+            city_grid=city_grid,
+            initial_walker_count=10,
+            initial_driver_count=10,
+            obstacles=gen_obstacles(city_grid, obstacles=obstacle_share)[0],
+            max_walker_spawn=1,
+            max_driver_spawn=1,
+            steps=50,
+            display=False,
+        ).to_parameters()
+        for obstacle_share in np.linspace(0, 0.2, 11)
+    ]
+
+
+def main():
+    for parameters in build_parameter_sweep():
+        model = CityModel(parameters)
+        model.run()
+
+
+if __name__ == "__main__":
+    main()
