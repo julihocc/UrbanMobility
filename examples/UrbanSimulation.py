@@ -205,6 +205,7 @@ def main():
     scenario_rerouting_flow()
     scenario_reacting_mixed_agents()
     scenario_complex_realistic()
+    _ANIMATION_RENDERER.finalize()
 
 
 if __name__ == "__main__":
