@@ -25,7 +25,22 @@ from utils.UrbanUtils import gen_city, gen_obstacles
 from visual.AnimationUtils import animation_plot
 
 
+def _is_notebook_runtime() -> bool:
+    try:
+        from IPython import get_ipython
+
+        return get_ipython() is not None
+    except Exception:
+        return False
+
+
+_RUNTIME_IS_NOTEBOOK = _is_notebook_runtime()
+
+
 def render_animation(animation):
+    if not _RUNTIME_IS_NOTEBOOK:
+        return None
+
     try:
         from IPython import get_ipython
         import IPython.display as display
@@ -47,11 +62,13 @@ def render_animation(animation):
     except Exception:
         pass
 
-    print("Animation object created. Run this file in a notebook to display HTML animations.")
     return None
 
 
 def _animate_model(model, figsize=(8, 6)):
+    if not _RUNTIME_IS_NOTEBOOK:
+        return None
+
     fig = plt.figure(figsize=figsize)
     ax = fig.add_subplot(111)
     animation = ap.animate(model, fig, ax, animation_plot)
