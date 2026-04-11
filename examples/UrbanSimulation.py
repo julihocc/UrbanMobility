@@ -15,64 +15,26 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-os.environ.setdefault("MPLBACKEND", "Agg")
-
-import agentpy as ap
-from matplotlib import pyplot as plt
 from model import CityModel, PoisonCityModel
 from examples_support import run_exploration, summarize_metrics
 from utils.UrbanUtils import gen_city, gen_obstacles
-from visual.AnimationUtils import animation_plot
+from visual import AnimationRenderer, animation_plot
+
+_ANIMATION_MODE = os.getenv("URBANMOBILITY_ANIMATION", "browser").strip().lower()
+_ANIMATION_OUTPUT_DIR = ROOT / "images" / "animations"
+_ANIMATION_RENDERER = AnimationRenderer(
+    mode=_ANIMATION_MODE,
+    output_dir=_ANIMATION_OUTPUT_DIR,
+)
 
 
-def _is_notebook_runtime() -> bool:
-    try:
-        from IPython import get_ipython
-
-        return get_ipython() is not None
-    except Exception:
-        return False
-
-
-_RUNTIME_IS_NOTEBOOK = _is_notebook_runtime()
-
-
-def render_animation(animation):
-    if not _RUNTIME_IS_NOTEBOOK:
-        return None
-
-    try:
-        from IPython import get_ipython
-        import IPython.display as display
-
-        if get_ipython() is not None:
-            return display.HTML(animation.to_jshtml())
-    except Exception:
-        pass
-
-    try:
-        animation._draw_was_started = True
-    except Exception:
-        pass
-
-    try:
-        from matplotlib import pyplot as _plt
-
-        _plt.close(animation._fig)
-    except Exception:
-        pass
-
-    return None
-
-
-def _animate_model(model, figsize=(8, 6)):
-    if not _RUNTIME_IS_NOTEBOOK:
-        return None
-
-    fig = plt.figure(figsize=figsize)
-    ax = fig.add_subplot(111)
-    animation = ap.animate(model, fig, ax, animation_plot)
-    return render_animation(animation)
+def _animate_model(model, scenario_name: str, figsize=(8, 6)):
+    return _ANIMATION_RENDERER.animate_model(
+        model,
+        animation_plot,
+        scenario_name,
+        figsize=figsize,
+    )
 
 
 def scenario_pedestrian_routes():
@@ -91,7 +53,7 @@ def scenario_pedestrian_routes():
     }
     result = run_exploration(parameters)
     print(summarize_metrics(result))
-    _animate_model(result.model, figsize=(8, 4))
+    _animate_model(result.model, "pedestrian_routes", figsize=(8, 4))
 
 
 def scenario_driver_routes():
@@ -111,7 +73,7 @@ def scenario_driver_routes():
         "steps": 40,
         "display": True,
     }
-    _animate_model(CityModel(parameters), figsize=(8, 6))
+    _animate_model(CityModel(parameters), "driver_routes", figsize=(8, 6))
 
 
 def scenario_reacting_drivers():
@@ -131,7 +93,7 @@ def scenario_reacting_drivers():
         "steps": 50,
         "display": False,
     }
-    _animate_model(CityModel(parameters), figsize=(8, 6))
+    _animate_model(CityModel(parameters), "reacting_drivers", figsize=(8, 6))
 
 
 def scenario_rerouting_blocked_driver():
@@ -157,7 +119,7 @@ def scenario_rerouting_blocked_driver():
         "steps": 50,
         "display": False,
     }
-    _animate_model(CityModel(parameters), figsize=(8, 6))
+    _animate_model(CityModel(parameters), "rerouting_blocked_driver", figsize=(8, 6))
 
 
 def scenario_rerouting_flow():
@@ -185,7 +147,7 @@ def scenario_rerouting_flow():
         "steps": 50,
         "display": False,
     }
-    _animate_model(CityModel(parameters), figsize=(8, 6))
+    _animate_model(CityModel(parameters), "rerouting_flow", figsize=(8, 6))
 
 
 def scenario_reacting_mixed_agents():
@@ -209,7 +171,7 @@ def scenario_reacting_mixed_agents():
         "steps": 40,
         "display": False,
     }
-    _animate_model(CityModel(parameters), figsize=(10, 6))
+    _animate_model(CityModel(parameters), "reacting_mixed_agents", figsize=(10, 6))
 
 
 def scenario_complex_realistic():
@@ -232,7 +194,7 @@ def scenario_complex_realistic():
         "steps": 120,
         "display": False,
     }
-    _animate_model(PoisonCityModel(parameters), figsize=(8, 8))
+    _animate_model(PoisonCityModel(parameters), "complex_realistic", figsize=(8, 8))
 
 
 def main():
