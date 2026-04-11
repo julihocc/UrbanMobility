@@ -18,14 +18,14 @@ The simulation models:
 
 The main project code lives at the repository root:
 
-- [notebooks/UrbanSimulation.py](./notebooks/UrbanSimulation.py): primary walkthrough for running and visualizing simulations.
+- [examples/UrbanSimulation.py](./examples/UrbanSimulation.py): primary walkthrough for running and visualizing simulations.
 - [main.py](./main.py): example seeded simulation setup for a single run.
 - [Reporting.py](./Reporting.py): experiment-style script for parameter sweeps.
-- [notebooks](./notebooks): focused examples for quickstart, sweeps, visualization, serialization, and GUI adapter usage.
+- [examples](./examples): focused examples for quickstart, sweeps, visualization, serialization, and GUI adapter usage.
 - [contracts/simulation_result.py](./contracts/simulation_result.py): result contract with JSON-friendly serialization.
 - [services/simulation_service.py](./services/simulation_service.py): application service boundary for running simulations.
 - [gui/controller.py](./gui/controller.py): GUI adapter skeleton that coordinates service calls and rendering.
-- [notebooks_support/helpers.py](./notebooks_support/helpers.py): exploration wrappers and metric summaries.
+- [examples_support/helpers.py](./examples_support/helpers.py): exploration wrappers and metric summaries.
 - [model/UrbanModelling.py](./model/UrbanModelling.py): `CityModel` orchestration, agent lifecycle, and metrics collection.
 - [model/AgentBase.py](./model/AgentBase.py): base classes and shared agent behavior.
 - [model/AgentImpl.py](./model/AgentImpl.py): concrete pedestrian and driver implementations.
@@ -57,7 +57,7 @@ python -m pip install agentpy numpy matplotlib
 
 ### Script-first workflow
 
-Start with [notebooks/UrbanSimulation.py](./notebooks/UrbanSimulation.py). It is the best entrypoint for understanding:
+Start with [examples/UrbanSimulation.py](./examples/UrbanSimulation.py). It is the best entrypoint for understanding:
 
 - city generation
 - agent initialization
@@ -67,20 +67,33 @@ Start with [notebooks/UrbanSimulation.py](./notebooks/UrbanSimulation.py). It is
 
 This is the recommended path if you want a reproducible walkthrough of the model and its outputs.
 
-Scripted exploration should call helpers from [notebooks_support/helpers.py](./notebooks_support/helpers.py):
+Run it directly:
+
+```powershell
+python .\examples\UrbanSimulation.py
+```
+
+Scripted exploration should call helpers from [examples_support/helpers.py](./examples_support/helpers.py):
 
 - run_exploration(parameters, include_heatmaps=False) for executing simulation runs from scripts.
 - summarize_metrics(result) for quick metric summaries without manually traversing nested dictionaries.
 
 ### Example catalog
 
-Additional library-oriented examples are available as plain scripts in [notebooks](./notebooks):
+Additional library-oriented examples are available as plain scripts in [examples](./examples):
 
-- [notebooks/01_quickstart_service.py](./notebooks/01_quickstart_service.py): service-layer quickstart with `SimulationConfig`.
-- [notebooks/02_parameter_sweep.py](./notebooks/02_parameter_sweep.py): compact parameter sweep with summarized outputs.
-- [notebooks/03_heatmaps_and_visualization.py](./notebooks/03_heatmaps_and_visualization.py): heatmap generation and visualization adapter usage.
-- [notebooks/04_result_serialization.py](./notebooks/04_result_serialization.py): `SimulationResult` to dict/JSON export patterns.
-- [notebooks/05_gui_adapter_pattern.py](./notebooks/05_gui_adapter_pattern.py): GUI controller and renderer integration pattern.
+- [examples/01_quickstart_service.py](./examples/01_quickstart_service.py): service-layer quickstart with `SimulationConfig`.
+- [examples/02_parameter_sweep.py](./examples/02_parameter_sweep.py): compact parameter sweep with summarized outputs.
+- [examples/03_heatmaps_and_visualization.py](./examples/03_heatmaps_and_visualization.py): heatmap generation and visualization adapter usage.
+- [examples/04_result_serialization.py](./examples/04_result_serialization.py): `SimulationResult` to dict/JSON export patterns.
+- [examples/05_gui_adapter_pattern.py](./examples/05_gui_adapter_pattern.py): GUI controller and renderer integration pattern.
+
+Run any focused example directly, for example:
+
+```powershell
+python .\examples\01_quickstart_service.py
+python .\examples\02_parameter_sweep.py
+```
 
 ### Python scripts
 
@@ -142,14 +155,14 @@ The codebase now follows a lightweight layered structure:
 - Domain logic: `model/` contains simulation rules and state transitions.
 - Application services: `services/` provides run use-cases for scripts and GUI.
 - Contracts: `contracts/` defines result objects and serialization boundaries.
-- Adapters: `visual/`, `gui/`, and `notebooks_support/` consume service outputs for different user interfaces.
+- Adapters: `visual/`, `gui/`, and `examples_support/` consume service outputs for different user interfaces.
 
 Recommended dependency direction:
 
-- model -> no dependency on services, gui, notebooks_support.
+- model -> no dependency on services, gui, examples_support.
 - services -> depends on model and contracts.
-- adapters (visual, gui, notebooks_support) -> depend on services and contracts.
-- entrypoints (main, Reporting, notebooks/*.py) -> depend on adapters and services, not directly on low-level model internals unless required for experimentation.
+- adapters (visual, gui, examples_support) -> depend on services and contracts.
+- entrypoints (main, Reporting, examples/*.py) -> depend on adapters and services, not directly on low-level model internals unless required for experimentation.
 
 ## Migration Checklist
 
@@ -188,7 +201,7 @@ model.run()
 After:
 
 ```python
-from notebooks_support import run_exploration, summarize_metrics
+from examples_support import run_exploration, summarize_metrics
 
 result = run_exploration(parameters)
 print(summarize_metrics(result))
@@ -222,3 +235,4 @@ print(summarize_metrics(result))
 - Run a fixed-seed scenario before and after migration.
 - Compare key outputs: arrivals, collisions, runovers, and heatmaps.
 - Keep parameter names and defaults aligned between scripts.
+

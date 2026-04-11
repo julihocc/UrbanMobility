@@ -1,7 +1,7 @@
 """Urban simulation: end-to-end walkthrough of pedestrian and driver scenarios.
 
 This is a comprehensive, scenario-rich example that overlaps with the focused
-examples in notebooks/01_... through notebooks/05_... .
+examples in examples/01_... through examples/05_... .
 Use the numbered examples for targeted workflows, and this one as an
 end-to-end exploratory walkthrough.
 """
@@ -20,7 +20,7 @@ os.environ.setdefault("MPLBACKEND", "Agg")
 import agentpy as ap
 from matplotlib import pyplot as plt
 from model import CityModel, PoisonCityModel
-from notebooks_support import run_exploration, summarize_metrics
+from examples_support import run_exploration, summarize_metrics
 from utils.UrbanUtils import gen_city, gen_obstacles
 from visual.AnimationUtils import animation_plot
 
@@ -230,3 +230,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

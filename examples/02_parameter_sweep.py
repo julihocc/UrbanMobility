@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from notebooks_support import summarize_metrics
+from examples_support import summarize_metrics
 from services import run_simulation_from_parameters
 from utils.UrbanUtils import gen_city, gen_obstacles
 
@@ -39,4 +39,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
