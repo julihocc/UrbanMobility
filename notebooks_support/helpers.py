@@ -7,7 +7,7 @@ from services.simulation_service import run_simulation_from_parameters
 def run_exploration(
     parameters: dict[str, Any], include_heatmaps: bool = False
 ) -> SimulationResult:
-    """Notebook-friendly wrapper around the application service."""
+    """Exploration-friendly wrapper around the application service."""
     return run_simulation_from_parameters(parameters, include_heatmaps=include_heatmaps)
 
 

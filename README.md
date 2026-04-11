@@ -2,7 +2,7 @@
 
 This repository contains a multi-agent urban mobility simulation for studying interactions between pedestrians and drivers on a grid-based city layout. The model combines weighted A* pathfinding, local sensing and reaction, and metric collection to analyze congestion, conflict zones, and mobility behavior under changing urban conditions.
 
-The codebase is built around AgentPy and is currently organized as a research-style source tree, with the notebook serving as the clearest end-to-end walkthrough.
+The codebase is built around AgentPy and is organized as a research-style source tree, with script-first examples for reproducible runs and reviews.
 
 ## Overview
 
@@ -18,14 +18,14 @@ The simulation models:
 
 The main project code lives at the repository root:
 
-- [UrbanSimulation.ipynb](./UrbanSimulation.ipynb): primary walkthrough for running and visualizing simulations.
+- [notebooks/UrbanSimulation.py](./notebooks/UrbanSimulation.py): primary walkthrough for running and visualizing simulations.
 - [main.py](./main.py): example seeded simulation setup for a single run.
 - [Reporting.py](./Reporting.py): experiment-style script for parameter sweeps.
 - [notebooks](./notebooks): focused examples for quickstart, sweeps, visualization, serialization, and GUI adapter usage.
 - [contracts/simulation_result.py](./contracts/simulation_result.py): result contract with JSON-friendly serialization.
 - [services/simulation_service.py](./services/simulation_service.py): application service boundary for running simulations.
 - [gui/controller.py](./gui/controller.py): GUI adapter skeleton that coordinates service calls and rendering.
-- [notebooks_support/helpers.py](./notebooks_support/helpers.py): notebook-focused wrappers and metric summaries.
+- [notebooks_support/helpers.py](./notebooks_support/helpers.py): exploration wrappers and metric summaries.
 - [model/UrbanModelling.py](./model/UrbanModelling.py): `CityModel` orchestration, agent lifecycle, and metrics collection.
 - [model/AgentBase.py](./model/AgentBase.py): base classes and shared agent behavior.
 - [model/AgentImpl.py](./model/AgentImpl.py): concrete pedestrian and driver implementations.
@@ -43,7 +43,6 @@ Recommended baseline environment:
 - `agentpy`
 - `numpy`
 - `matplotlib`
-- `jupyter` for notebook-based exploration
 
 Example setup:
 
@@ -51,14 +50,14 @@ Example setup:
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
-python -m pip install agentpy numpy matplotlib jupyter
+python -m pip install agentpy numpy matplotlib
 ```
 
 ## How to Use the Project
 
-### Notebook-first workflow
+### Script-first workflow
 
-Start with [UrbanSimulation.ipynb](./UrbanSimulation.ipynb). It is the best entrypoint for understanding:
+Start with [notebooks/UrbanSimulation.py](./notebooks/UrbanSimulation.py). It is the best entrypoint for understanding:
 
 - city generation
 - agent initialization
@@ -68,20 +67,20 @@ Start with [UrbanSimulation.ipynb](./UrbanSimulation.ipynb). It is the best entr
 
 This is the recommended path if you want a reproducible walkthrough of the model and its outputs.
 
-Notebook exploration should call helpers from [notebooks_support/helpers.py](./notebooks_support/helpers.py):
+Scripted exploration should call helpers from [notebooks_support/helpers.py](./notebooks_support/helpers.py):
 
-- run_exploration(parameters, include_heatmaps=False) for executing simulation runs from notebook cells.
+- run_exploration(parameters, include_heatmaps=False) for executing simulation runs from scripts.
 - summarize_metrics(result) for quick metric summaries without manually traversing nested dictionaries.
 
-### Notebook catalog
+### Example catalog
 
-Additional library-oriented examples are available in [notebooks](./notebooks):
+Additional library-oriented examples are available as plain scripts in [notebooks](./notebooks):
 
-- [notebooks/01_quickstart_service.ipynb](./notebooks/01_quickstart_service.ipynb): service-layer quickstart with `SimulationConfig`.
-- [notebooks/02_parameter_sweep.ipynb](./notebooks/02_parameter_sweep.ipynb): compact parameter sweep with summarized outputs.
-- [notebooks/03_heatmaps_and_visualization.ipynb](./notebooks/03_heatmaps_and_visualization.ipynb): heatmap generation and visualization adapter usage.
-- [notebooks/04_result_serialization.ipynb](./notebooks/04_result_serialization.ipynb): `SimulationResult` to dict/JSON export patterns.
-- [notebooks/05_gui_adapter_pattern.ipynb](./notebooks/05_gui_adapter_pattern.ipynb): GUI controller and renderer integration pattern.
+- [notebooks/01_quickstart_service.py](./notebooks/01_quickstart_service.py): service-layer quickstart with `SimulationConfig`.
+- [notebooks/02_parameter_sweep.py](./notebooks/02_parameter_sweep.py): compact parameter sweep with summarized outputs.
+- [notebooks/03_heatmaps_and_visualization.py](./notebooks/03_heatmaps_and_visualization.py): heatmap generation and visualization adapter usage.
+- [notebooks/04_result_serialization.py](./notebooks/04_result_serialization.py): `SimulationResult` to dict/JSON export patterns.
+- [notebooks/05_gui_adapter_pattern.py](./notebooks/05_gui_adapter_pattern.py): GUI controller and renderer integration pattern.
 
 ### Python scripts
 
@@ -90,7 +89,7 @@ The repository also includes script-based examples:
 - [main.py](./main.py) shows how to configure a seeded city, run the application service, and produce heatmap-oriented outputs.
 - [Reporting.py](./Reporting.py) shows how to build small experiment sweeps by varying parameters across multiple runs through the service layer.
 
-These files are useful references when moving notebook logic into reusable Python code.
+These files are useful references when moving exploratory logic into reusable Python code.
 
 ### Application service API
 
@@ -103,7 +102,7 @@ Both functions return [contracts/simulation_result.py](./contracts/simulation_re
 
 ### Result contract and serialization
 
-[contracts/simulation_result.py](./contracts/simulation_result.py) provides a transport-friendly output object for scripts, notebook cells, and GUI controllers.
+[contracts/simulation_result.py](./contracts/simulation_result.py) provides a transport-friendly output object for scripts and GUI controllers.
 
 - to_dict(include_metrics=True, include_spawned_agents=True, include_heatmaps=True)
 - to_json(include_metrics=True, include_spawned_agents=True, include_heatmaps=True, indent=2)
@@ -130,18 +129,18 @@ Key implementation ideas in the current codebase:
 
 ## Reproducibility Notes
 
-The project already uses seeded randomness in its main simulation entrypoint. For comparable experiments and reporting runs, keep seeds explicit and keep parameter names aligned across notebooks and scripts.
+The project already uses seeded randomness in its main simulation entrypoint. For comparable experiments and reporting runs, keep seeds explicit and keep parameter names aligned across scripts.
 
 ## Current State
 
-This repository is best treated as a simulation and analysis workspace rather than a packaged Python library. The notebook and source files document the intended workflow, while scripts serve as concrete examples for extending experiments and analysis.
+This repository is best treated as a simulation and analysis workspace rather than a packaged Python library. The source files and script examples document the intended workflow.
 
 ## Separation of Concerns
 
 The codebase now follows a lightweight layered structure:
 
 - Domain logic: `model/` contains simulation rules and state transitions.
-- Application services: `services/` provides run use-cases for scripts, GUI, and notebooks.
+- Application services: `services/` provides run use-cases for scripts and GUI.
 - Contracts: `contracts/` defines result objects and serialization boundaries.
 - Adapters: `visual/`, `gui/`, and `notebooks_support/` consume service outputs for different user interfaces.
 
@@ -150,11 +149,11 @@ Recommended dependency direction:
 - model -> no dependency on services, gui, notebooks_support.
 - services -> depends on model and contracts.
 - adapters (visual, gui, notebooks_support) -> depend on services and contracts.
-- entrypoints (main, Reporting, notebooks) -> depend on adapters and services, not directly on low-level model internals unless required for experimentation.
+- entrypoints (main, Reporting, notebooks/*.py) -> depend on adapters and services, not directly on low-level model internals unless required for experimentation.
 
 ## Migration Checklist
 
-Use this checklist when updating legacy scripts or notebook cells.
+Use this checklist when updating legacy scripts.
 
 ### 1) Replace direct model execution
 
@@ -175,7 +174,7 @@ from services import run_simulation_from_parameters
 result = run_simulation_from_parameters(parameters)
 ```
 
-### 2) Replace notebook cell orchestration
+### 2) Replace ad-hoc orchestration
 
 Before:
 
@@ -222,4 +221,4 @@ print(summarize_metrics(result))
 
 - Run a fixed-seed scenario before and after migration.
 - Compare key outputs: arrivals, collisions, runovers, and heatmaps.
-- Keep parameter names and defaults aligned between scripts and notebooks.
+- Keep parameter names and defaults aligned between scripts.
