@@ -1,6 +1,6 @@
 from matplotlib import pyplot as plt
 from matplotlib.lines import Line2D
-from matplotlib.patches import Patch, Rectangle
+from matplotlib.patches import Circle, Patch, Rectangle
 import numpy as np
 import agentpy as ap
 
@@ -64,52 +64,23 @@ def plot_agents(city, ax, show_speed=False, show_id=False):
     agents = city.agents
     fig_w, fig_h = ax.figure.get_size_inches()
     h, w = city.city_grid.shape
-    marker_dict = {
-        (-1, 0): "^",
-        (1, 0): "v",
-        (0, 1): ">",
-        (0, -1): "<",
-        (0, 0): "o",
-    }  # Directions of agents
     for agent in agents:
         pos, dir = agent.position, agent.direction
         is_walker = agent.agent_type == "walker"
-        (color, size) = (
-            ("#f9d65c", 42)
-            if is_walker
-            else ("#2b7fff", 60)
-            if agent.active
-            else ("white", 60)
-        )
+        (color, size) = (("#f4f4f4", 42) if is_walker else ("#4ea1ff", 62) if agent.active else ("#d9d9d9", 62))
         msize = 0.9 * size * fig_w / w
 
         if is_walker:
-            # Walkers use a ring + center marker so they stay visible on all terrains.
-            ax.plot(
-                pos[1] - 0.5,
-                pos[0] - 0.5,
-                marker="o",
-                markersize=msize,
-                markerfacecolor=color,
-                markeredgecolor="black",
-                markeredgewidth=1.2,
-            )
-            ax.plot(
-                pos[1] - 0.5,
-                pos[0] - 0.5,
-                marker="o",
-                markersize=msize * 0.35,
-                markerfacecolor="#c23b22",
-                markeredgecolor="none",
-            )
+            draw_pedestrian_icon(ax, pos[1] - 0.5, pos[0] - 0.5, scale=0.8)
         else:
-            ax.plot(
+            draw_car_icon(
+                ax,
                 pos[1] - 0.5,
                 pos[0] - 0.5,
-                marker_dict[dir],
-                markersize=msize,
+                dir,
                 color=color,
-            )  # Agent plot
+                active=agent.active,
+            )
         if show_speed:
             ax.text(
                 pos[1] - 1,
@@ -130,13 +101,60 @@ def plot_agents(city, ax, show_speed=False, show_id=False):
             ax.plot(
                 [np[1] - 0.5],
                 [np[0] - 0.5],
-                marker="o",
-                color="#ffb347" if is_walker else color,
-                markeredgecolor="black" if is_walker else "none",
-                markeredgewidth=0.4 if is_walker else 0,
-                markersize=msize / 5 if is_walker else msize / 6,
-                alpha=max(0.25, (n - i) / n),
+                marker="o" if is_walker else "s",
+                color="#f2e9e4" if is_walker else "#8ec5ff",
+                markeredgecolor="#1a1a1a" if is_walker else "none",
+                markeredgewidth=0.3 if is_walker else 0,
+                markersize=msize / 6,
+                alpha=max(0.22, (n - i) / n),
             )
+
+
+def draw_pedestrian_icon(ax, x, y, scale=1.0):
+    head_r = 0.07 * scale
+    ax.add_patch(
+        Circle(
+            (x, y - 0.08 * scale),
+            radius=head_r,
+            facecolor="#f5f5f5",
+            edgecolor="#111111",
+            linewidth=0.8,
+            zorder=6,
+        )
+    )
+    ax.plot([x, x], [y - 0.01 * scale, y + 0.12 * scale], color="#111111", linewidth=1.1, zorder=6)
+    ax.plot([x - 0.07 * scale, x + 0.07 * scale], [y + 0.04 * scale, y + 0.02 * scale], color="#111111", linewidth=1.0, zorder=6)
+    ax.plot([x, x - 0.06 * scale], [y + 0.12 * scale, y + 0.2 * scale], color="#111111", linewidth=1.0, zorder=6)
+    ax.plot([x, x + 0.06 * scale], [y + 0.12 * scale, y + 0.2 * scale], color="#111111", linewidth=1.0, zorder=6)
+
+
+def draw_car_icon(ax, x, y, direction, color="#4ea1ff", active=True):
+    vertical = direction in {(-1, 0), (1, 0)}
+    body_w, body_h = (0.26, 0.44) if vertical else (0.44, 0.26)
+    body_color = color if active else "#bdbdbd"
+    body = Rectangle(
+        (x - body_w / 2, y - body_h / 2),
+        body_w,
+        body_h,
+        facecolor=body_color,
+        edgecolor="#111111",
+        linewidth=0.8,
+        zorder=5,
+    )
+    ax.add_patch(body)
+
+    wx = x + direction[1] * (body_w * 0.22)
+    wy = y + direction[0] * (body_h * 0.22)
+    win_w, win_h = (0.15, 0.11) if vertical else (0.11, 0.15)
+    windshield = Rectangle(
+        (wx - win_w / 2, wy - win_h / 2),
+        win_w,
+        win_h,
+        facecolor="#d8f0ff",
+        edgecolor="none",
+        zorder=6,
+    )
+    ax.add_patch(windshield)
 
 
 ###################################
@@ -246,13 +264,13 @@ def plot_city(city, ax, alpha="ff"):
     ax.set_xlim(-0.5, w - 0.5)
     ax.set_ylim(h - 0.5, -0.5)
     ax.tick_params(axis="both", length=0, labelbottom=False, labelleft=False)
-    # Google Maps-inspired terrain palette.
+    # High-contrast street-style terrain palette.
     color_dict = {
-        s: "#f3efe6" + alpha,
-        z: "#efe4b0" + alpha,
-        b: "#bfd9a7" + alpha,
-        r: "#cfd5db" + alpha,
-        p: "#bcd2ea" + alpha,
+        s: "#6f747a" + alpha,
+        z: "#2b2b2d" + alpha,
+        b: "#4f6a4a" + alpha,
+        r: "#1d1f22" + alpha,
+        p: "#3e556e" + alpha,
     }
 
     ap.gridplot(grid, ax=ax, color_dict=color_dict, convert=True)
@@ -267,74 +285,74 @@ def draw_google_map_overlays(city_grid, ax):
             cell_type = cell_code[0]
 
             if cell_type in {"r", "t", "l"}:
-                # Subtle street boundary to mimic tiled map roads.
+                # Street boundary to make lane blocks read like asphalt tiles.
                 ax.add_patch(
                     Rectangle(
                         (j - 0.5, i - 0.5),
                         1,
                         1,
                         fill=False,
-                        edgecolor="#ffffff",
-                        linewidth=0.35,
-                        alpha=0.35,
+                        edgecolor="#505258",
+                        linewidth=0.45,
+                        alpha=0.55,
                     )
                 )
 
-                # Light lane center hints based on available movement directions.
+                # Centerline hints to improve driving-lane readability.
                 dirs = cell_code[1:].strip()
                 if "N" in dirs or "S" in dirs or dirs == "":
                     ax.plot(
                         [j, j],
                         [i - 0.28, i + 0.28],
-                        color="#ffffff",
-                        linewidth=0.8,
-                        alpha=0.55,
+                        color="#f4e38c",
+                        linewidth=0.95,
+                        alpha=0.7,
                         solid_capstyle="round",
                     )
                 if "E" in dirs or "W" in dirs or dirs == "":
                     ax.plot(
                         [j - 0.28, j + 0.28],
                         [i, i],
-                        color="#ffffff",
-                        linewidth=0.8,
-                        alpha=0.55,
+                        color="#f4e38c",
+                        linewidth=0.95,
+                        alpha=0.7,
                         solid_capstyle="round",
                     )
 
             elif cell_type == "z":
-                # Zebra crossing strokes for immediate pedestrian-zone recognition.
+                # Strong zebra stripes on dark asphalt.
                 for offset in (-0.24, -0.08, 0.08, 0.24):
                     ax.plot(
                         [j - 0.38, j + 0.38],
                         [i + offset, i + offset],
                         color="#ffffff",
-                        linewidth=1.4,
-                        alpha=0.9,
+                        linewidth=1.7,
+                        alpha=0.98,
                         solid_capstyle="round",
                     )
 
 
 def add_visual_legend(ax):
     handles = [
-        Patch(facecolor="#f3efe6", edgecolor="none", label="Sidewalk"),
-        Patch(facecolor="#cfd5db", edgecolor="none", label="Road"),
-        Patch(facecolor="#efe4b0", edgecolor="none", label="Crosswalk"),
+        Patch(facecolor="#6f747a", edgecolor="none", label="Sidewalk"),
+        Patch(facecolor="#1d1f22", edgecolor="none", label="Road"),
+        Patch(facecolor="#2b2b2d", edgecolor="none", label="Crosswalk (zebra)"),
         Line2D(
             [],
             [],
             marker="o",
             color="none",
-            markerfacecolor="#f9d65c",
-            markeredgecolor="black",
+            markerfacecolor="#f5f5f5",
+            markeredgecolor="#111111",
             markersize=8,
             label="Pedestrian",
         ),
         Line2D(
             [],
             [],
-            marker=">",
-            color="#2b7fff",
-            markerfacecolor="#2b7fff",
+            marker="s",
+            color="#4ea1ff",
+            markerfacecolor="#4ea1ff",
             markersize=8,
             label="Car",
         ),
