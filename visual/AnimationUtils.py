@@ -6,7 +6,7 @@ import agentpy as ap
 def animation_plot(model, ax, alpha="80"):
     plot_city(model.city, ax, alpha=alpha)
     plot_agents(model.city, ax)
-    plot_collisions(model.metrics, ax)
+    plot_collisions(model, ax)
     """
     for t in range(max(0, model.t - 10), model.t):
         if 'collisions' in model.metrics[t].keys():
@@ -22,7 +22,8 @@ def animation_plot(model, ax, alpha="80"):
 
 
 ###################################
-def plot_collisions(metrics, ax):
+def plot_collisions(model, ax):
+    metrics = model.metrics
     T = max(metrics.keys())
     for t in range(max(0, T - 10), T):
         step_metrics = metrics.get(t, {})
@@ -45,8 +46,14 @@ def plot_collisions(metrics, ax):
         [len(metrics.get(t, {}).get("collisions", [])) for t in range(0, T)]
     )
     nrunovers = sum([len(metrics.get(t, {}).get("runovers", [])) for t in range(0, T)])
+    total_walkers = sum(1 for a in model.city.agents if a.agent_type == "walker")
+    active_walkers = sum(
+        1 for a in model.city.agents if a.agent_type == "walker" and a.active
+    )
     ax.set_title(
-        "t: {}, runovers: {}, collisions: {}".format(T, nrunovers, ncollisions)
+        "t: {}, walkers(active/total): {}/{}, runovers: {}, collisions: {}".format(
+            T, active_walkers, total_walkers, nrunovers, ncollisions
+        )
     )
 
 

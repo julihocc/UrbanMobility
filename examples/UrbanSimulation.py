@@ -43,6 +43,7 @@ def scenario_pedestrian_routes():
     gen_obstacles(city_grid, 10, 10)
 
     parameters = {
+        "seed": 0,
         "city_grid": city_grid,
         "walkers": [
             {"start": (5, 9), "goal": (9, 14), "max_speed": 5 + 2 * i, "weight": i}
@@ -53,7 +54,8 @@ def scenario_pedestrian_routes():
     }
     result = run_exploration(parameters)
     print(summarize_metrics(result))
-    _animate_model(result.model, "pedestrian_routes", figsize=(8, 4))
+    # Animate a fresh model instance to ensure frame-by-frame motion is rendered.
+    _animate_model(CityModel(parameters), "pedestrian_routes", figsize=(8, 4))
 
 
 def scenario_driver_routes():
