@@ -66,7 +66,7 @@ def plot_agents(city, ax, show_speed=False, show_id=False):
     for agent in agents:
         pos, dir = agent.position, agent.direction
         is_walker = agent.agent_type == "walker"
-        (color, size) = (("#f4f4f4", 42) if is_walker else ("#4ea1ff", 62) if agent.active else ("#d9d9d9", 62))
+        (color, size) = (("#ff7f11", 42) if is_walker else ("#0050c8", 62) if agent.active else ("#7f8c8d", 62))
         msize = 0.9 * size * fig_w / w
 
         if is_walker:
@@ -101,7 +101,7 @@ def plot_agents(city, ax, show_speed=False, show_id=False):
                 [np[1] - 0.5],
                 [np[0] - 0.5],
                 marker="o" if is_walker else "s",
-                color="#f2e9e4" if is_walker else "#8ec5ff",
+                color="#ff9f1c" if is_walker else "#1f6fff",
                 markeredgecolor="#1a1a1a" if is_walker else "none",
                 markeredgewidth=0.3 if is_walker else 0,
                 markersize=msize / 6,
@@ -116,7 +116,7 @@ def draw_pedestrian_icon(ax, x, y, scale=1.0, transform=None):
         Circle(
             (x, y - 0.08 * scale),
             radius=head_r,
-            facecolor="#ffe066",
+            facecolor="#ff7f11",
             edgecolor="#111111",
             linewidth=0.8,
             zorder=6,
@@ -129,7 +129,7 @@ def draw_pedestrian_icon(ax, x, y, scale=1.0, transform=None):
     ax.plot([x, x + 0.06 * scale], [y + 0.12 * scale, y + 0.2 * scale], color="#111111", linewidth=1.2, zorder=6, transform=transform)
 
 
-def draw_car_icon(ax, x, y, direction, color="#00a8ff", active=True, scale=1.0, transform=None):
+def draw_car_icon(ax, x, y, direction, color="#0050c8", active=True, scale=1.0, transform=None):
     transform = ax.transData if transform is None else transform
     vertical = direction in {(-1, 0), (1, 0)}
     body_w, body_h = (0.26 * scale, 0.44 * scale) if vertical else (0.44 * scale, 0.26 * scale)
@@ -153,7 +153,7 @@ def draw_car_icon(ax, x, y, direction, color="#00a8ff", active=True, scale=1.0, 
         (wx - win_w / 2, wy - win_h / 2),
         win_w,
         win_h,
-        facecolor="#d8f0ff",
+        facecolor="#8ec5ff",
         edgecolor="none",
         zorder=6,
         transform=transform,
@@ -354,8 +354,8 @@ def draw_google_map_overlays(city_grid, ax):
 
 def add_visual_legend(ax):
     # Draw a custom legend so agent symbols match the exact simulation icons.
-    x0, y0 = 0.69, 0.97
-    width, height = 0.30, 0.30
+    x0, y0 = 1.02, 0.97
+    width, height = 0.21, 0.30
     panel = Rectangle(
         (x0, y0 - height),
         width,
@@ -366,6 +366,7 @@ def add_visual_legend(ax):
         linewidth=0.8,
         alpha=0.94,
         zorder=20,
+        clip_on=False,
     )
     ax.add_patch(panel)
 
@@ -387,6 +388,7 @@ def add_visual_legend(ax):
             facecolor="#8a8f98",
             edgecolor="none",
             zorder=21,
+            clip_on=False,
         )
     )
     ax.add_patch(
@@ -398,6 +400,7 @@ def add_visual_legend(ax):
             facecolor="#0f1115",
             edgecolor="none",
             zorder=21,
+            clip_on=False,
         )
     )
     ax.add_patch(
@@ -409,6 +412,7 @@ def add_visual_legend(ax):
             facecolor="#181a1f",
             edgecolor="none",
             zorder=21,
+            clip_on=False,
         )
     )
     for stripe_y in (-0.012, -0.006, 0.0, 0.006):
@@ -419,6 +423,7 @@ def add_visual_legend(ax):
             color="white",
             linewidth=1.2,
             zorder=22,
+            clip_on=False,
         )
 
     # Agent icons (same drawing functions as simulation).
@@ -451,6 +456,7 @@ def add_visual_legend(ax):
             color="#111111",
             va="center",
             zorder=22,
+            clip_on=False,
         )
 
 
