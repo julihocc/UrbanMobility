@@ -138,7 +138,5 @@ class AnimationRenderer:
 
         fig = plt.figure(figsize=figsize)
         ax = fig.add_subplot(111)
-        # Reserve space at the right side for the simulation info panel.
-        fig.subplots_adjust(right=0.78)
         animation = ap.animate(model, fig, ax, animation_plot)
         return self.render(animation, scenario_name)
