@@ -70,17 +70,43 @@ def plot_agents(city, ax, show_speed=False, show_id=False):
     }  # Directions of agents
     for agent in agents:
         pos, dir = agent.position, agent.direction
+        is_walker = agent.agent_type == "walker"
         (color, size) = (
-            ("green", 30)
-            if agent.agent_type == "walker"
-            else ("blue", 60)
+            ("#f9d65c", 42)
+            if is_walker
+            else ("#2b7fff", 60)
             if agent.active
             else ("white", 60)
         )
         msize = 0.9 * size * fig_w / w
-        ax.plot(
-            pos[1] - 0.5, pos[0] - 0.5, marker_dict[dir], markersize=msize, color=color
-        )  # Agent plot
+
+        if is_walker:
+            # Walkers use a ring + center marker so they stay visible on all terrains.
+            ax.plot(
+                pos[1] - 0.5,
+                pos[0] - 0.5,
+                marker="o",
+                markersize=msize,
+                markerfacecolor=color,
+                markeredgecolor="black",
+                markeredgewidth=1.2,
+            )
+            ax.plot(
+                pos[1] - 0.5,
+                pos[0] - 0.5,
+                marker="o",
+                markersize=msize * 0.35,
+                markerfacecolor="#c23b22",
+                markeredgecolor="none",
+            )
+        else:
+            ax.plot(
+                pos[1] - 0.5,
+                pos[0] - 0.5,
+                marker_dict[dir],
+                markersize=msize,
+                color=color,
+            )  # Agent plot
         if show_speed:
             ax.text(
                 pos[1] - 1,
@@ -102,9 +128,11 @@ def plot_agents(city, ax, show_speed=False, show_id=False):
                 [np[1] - 0.5],
                 [np[0] - 0.5],
                 marker="o",
-                color=color,
-                markersize=msize / 6,
-                alpha=(n - i) / n,
+                color="#ffb347" if is_walker else color,
+                markeredgecolor="black" if is_walker else "none",
+                markeredgewidth=0.4 if is_walker else 0,
+                markersize=msize / 5 if is_walker else msize / 6,
+                alpha=max(0.25, (n - i) / n),
             )
 
 
