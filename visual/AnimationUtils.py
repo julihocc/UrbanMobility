@@ -116,7 +116,7 @@ def draw_pedestrian_icon(ax, x, y, scale=1.0, transform=None):
         Circle(
             (x, y - 0.08 * scale),
             radius=head_r,
-            facecolor="#f5f5f5",
+            facecolor="#ffe066",
             edgecolor="#111111",
             linewidth=0.8,
             zorder=6,
@@ -129,7 +129,7 @@ def draw_pedestrian_icon(ax, x, y, scale=1.0, transform=None):
     ax.plot([x, x + 0.06 * scale], [y + 0.12 * scale, y + 0.2 * scale], color="#111111", linewidth=1.2, zorder=6, transform=transform)
 
 
-def draw_car_icon(ax, x, y, direction, color="#4ea1ff", active=True, scale=1.0, transform=None):
+def draw_car_icon(ax, x, y, direction, color="#00a8ff", active=True, scale=1.0, transform=None):
     transform = ax.transData if transform is None else transform
     vertical = direction in {(-1, 0), (1, 0)}
     body_w, body_h = (0.26 * scale, 0.44 * scale) if vertical else (0.44 * scale, 0.26 * scale)
@@ -268,13 +268,13 @@ def plot_city(city, ax, alpha="ff"):
     ax.set_xlim(-0.5, w - 0.5)
     ax.set_ylim(h - 0.5, -0.5)
     ax.tick_params(axis="both", length=0, labelbottom=False, labelleft=False)
-    # High-contrast street-style terrain palette.
+    # Vibrant, high-contrast street-style terrain palette.
     color_dict = {
-        s: "#6f747a" + alpha,
-        z: "#2b2b2d" + alpha,
-        b: "#4f6a4a" + alpha,
-        r: "#1d1f22" + alpha,
-        p: "#3e556e" + alpha,
+        s: "#8a8f98" + alpha,
+        z: "#181a1f" + alpha,
+        b: "#4f8f5a" + alpha,
+        r: "#0f1115" + alpha,
+        p: "#2d7dd2" + alpha,
     }
 
     ap.gridplot(grid, ax=ax, color_dict=color_dict, convert=True)
@@ -308,34 +308,34 @@ def draw_google_map_overlays(city_grid, ax):
                     ax.plot(
                         [j - 0.12, j - 0.12],
                         [i - 0.28, i + 0.28],
-                        color="#f4e38c",
-                        linewidth=0.85,
-                        alpha=0.62,
+                        color="#ffe066",
+                        linewidth=1.05,
+                        alpha=0.78,
                         solid_capstyle="round",
                     )
                     ax.plot(
                         [j + 0.12, j + 0.12],
                         [i - 0.28, i + 0.28],
-                        color="#f4e38c",
-                        linewidth=0.85,
-                        alpha=0.62,
+                        color="#ffe066",
+                        linewidth=1.05,
+                        alpha=0.78,
                         solid_capstyle="round",
                     )
                 if "E" in dirs or "W" in dirs or dirs == "":
                     ax.plot(
                         [j - 0.28, j + 0.28],
                         [i - 0.12, i - 0.12],
-                        color="#f4e38c",
-                        linewidth=0.85,
-                        alpha=0.62,
+                        color="#ffe066",
+                        linewidth=1.05,
+                        alpha=0.78,
                         solid_capstyle="round",
                     )
                     ax.plot(
                         [j - 0.28, j + 0.28],
                         [i + 0.12, i + 0.12],
-                        color="#f4e38c",
-                        linewidth=0.85,
-                        alpha=0.62,
+                        color="#ffe066",
+                        linewidth=1.05,
+                        alpha=0.78,
                         solid_capstyle="round",
                     )
 
@@ -354,8 +354,8 @@ def draw_google_map_overlays(city_grid, ax):
 
 def add_visual_legend(ax):
     # Draw a custom legend so agent symbols match the exact simulation icons.
-    x0, y0 = 0.74, 0.97
-    width, height = 0.24, 0.24
+    x0, y0 = 0.69, 0.97
+    width, height = 0.30, 0.30
     panel = Rectangle(
         (x0, y0 - height),
         width,
@@ -370,21 +370,21 @@ def add_visual_legend(ax):
     ax.add_patch(panel)
 
     rows = [
-        ("Sidewalk", y0 - 0.045),
-        ("Road", y0 - 0.087),
-        ("Crosswalk", y0 - 0.129),
-        ("Pedestrian", y0 - 0.171),
-        ("Car", y0 - 0.213),
+        ("Sidewalk", y0 - 0.052),
+        ("Road", y0 - 0.103),
+        ("Crosswalk", y0 - 0.154),
+        ("Pedestrian", y0 - 0.205),
+        ("Car", y0 - 0.256),
     ]
 
     # Terrain swatches.
     ax.add_patch(
         Rectangle(
             (x0 + 0.015, rows[0][1] - 0.015),
-            0.03,
-            0.022,
+            0.038,
+            0.028,
             transform=ax.transAxes,
-            facecolor="#6f747a",
+            facecolor="#8a8f98",
             edgecolor="none",
             zorder=21,
         )
@@ -392,10 +392,10 @@ def add_visual_legend(ax):
     ax.add_patch(
         Rectangle(
             (x0 + 0.015, rows[1][1] - 0.015),
-            0.03,
-            0.022,
+            0.038,
+            0.028,
             transform=ax.transAxes,
-            facecolor="#1d1f22",
+            facecolor="#0f1115",
             edgecolor="none",
             zorder=21,
         )
@@ -403,40 +403,40 @@ def add_visual_legend(ax):
     ax.add_patch(
         Rectangle(
             (x0 + 0.015, rows[2][1] - 0.015),
-            0.03,
-            0.022,
+            0.038,
+            0.028,
             transform=ax.transAxes,
-            facecolor="#2b2b2d",
+            facecolor="#181a1f",
             edgecolor="none",
             zorder=21,
         )
     )
     for stripe_y in (-0.012, -0.006, 0.0, 0.006):
         ax.plot(
-            [x0 + 0.016, x0 + 0.044],
+            [x0 + 0.017, x0 + 0.051],
             [rows[2][1] + stripe_y, rows[2][1] + stripe_y],
             transform=ax.transAxes,
             color="white",
-            linewidth=1.0,
+            linewidth=1.2,
             zorder=22,
         )
 
     # Agent icons (same drawing functions as simulation).
     draw_pedestrian_icon(
         ax,
-        x0 + 0.03,
+        x0 + 0.034,
         rows[3][1] - 0.002,
-        scale=0.15,
+        scale=0.21,
         transform=ax.transAxes,
     )
     draw_car_icon(
         ax,
-        x0 + 0.03,
+        x0 + 0.034,
         rows[4][1] - 0.002,
         (0, 1),
-        color="#4ea1ff",
+        color="#00a8ff",
         active=True,
-        scale=0.14,
+        scale=0.20,
         transform=ax.transAxes,
     )
 
@@ -446,7 +446,8 @@ def add_visual_legend(ax):
             y,
             label,
             transform=ax.transAxes,
-            fontsize=8,
+            fontsize=9,
+            fontweight="bold",
             color="#111111",
             va="center",
             zorder=22,
