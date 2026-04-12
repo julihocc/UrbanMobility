@@ -8,7 +8,6 @@ def animation_plot(model, ax, alpha="80"):
     plot_city(model.city, ax, alpha=alpha)
     plot_agents(model.city, ax)
     plot_collisions(model, ax)
-    add_visual_legend(ax)
     """
     for t in range(max(0, model.t - 10), model.t):
         if 'collisions' in model.metrics[t].keys():
