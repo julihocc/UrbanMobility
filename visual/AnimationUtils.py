@@ -71,7 +71,7 @@ def plot_agents(city, ax, show_speed=False, show_id=False):
         msize = 0.9 * size * fig_w / w
 
         if is_walker:
-            draw_pedestrian_icon(ax, pos[1] - 0.5, pos[0] - 0.5, scale=0.8)
+            draw_pedestrian_icon(ax, pos[1] - 0.5, pos[0] - 0.5, scale=1.08)
         else:
             draw_car_icon(
                 ax,
@@ -122,10 +122,10 @@ def draw_pedestrian_icon(ax, x, y, scale=1.0):
             zorder=6,
         )
     )
-    ax.plot([x, x], [y - 0.01 * scale, y + 0.12 * scale], color="#111111", linewidth=1.1, zorder=6)
-    ax.plot([x - 0.07 * scale, x + 0.07 * scale], [y + 0.04 * scale, y + 0.02 * scale], color="#111111", linewidth=1.0, zorder=6)
-    ax.plot([x, x - 0.06 * scale], [y + 0.12 * scale, y + 0.2 * scale], color="#111111", linewidth=1.0, zorder=6)
-    ax.plot([x, x + 0.06 * scale], [y + 0.12 * scale, y + 0.2 * scale], color="#111111", linewidth=1.0, zorder=6)
+    ax.plot([x, x], [y - 0.01 * scale, y + 0.12 * scale], color="#111111", linewidth=1.35, zorder=6)
+    ax.plot([x - 0.07 * scale, x + 0.07 * scale], [y + 0.04 * scale, y + 0.02 * scale], color="#111111", linewidth=1.2, zorder=6)
+    ax.plot([x, x - 0.06 * scale], [y + 0.12 * scale, y + 0.2 * scale], color="#111111", linewidth=1.2, zorder=6)
+    ax.plot([x, x + 0.06 * scale], [y + 0.12 * scale, y + 0.2 * scale], color="#111111", linewidth=1.2, zorder=6)
 
 
 def draw_car_icon(ax, x, y, direction, color="#4ea1ff", active=True):
@@ -298,24 +298,40 @@ def draw_google_map_overlays(city_grid, ax):
                     )
                 )
 
-                # Centerline hints to improve driving-lane readability.
+                # Lane-divider hints as separated parallel lines (not centerlines).
                 dirs = cell_code[1:].strip()
                 if "N" in dirs or "S" in dirs or dirs == "":
                     ax.plot(
-                        [j, j],
+                        [j - 0.12, j - 0.12],
                         [i - 0.28, i + 0.28],
                         color="#f4e38c",
-                        linewidth=0.95,
-                        alpha=0.7,
+                        linewidth=0.85,
+                        alpha=0.62,
+                        solid_capstyle="round",
+                    )
+                    ax.plot(
+                        [j + 0.12, j + 0.12],
+                        [i - 0.28, i + 0.28],
+                        color="#f4e38c",
+                        linewidth=0.85,
+                        alpha=0.62,
                         solid_capstyle="round",
                     )
                 if "E" in dirs or "W" in dirs or dirs == "":
                     ax.plot(
                         [j - 0.28, j + 0.28],
-                        [i, i],
+                        [i - 0.12, i - 0.12],
                         color="#f4e38c",
-                        linewidth=0.95,
-                        alpha=0.7,
+                        linewidth=0.85,
+                        alpha=0.62,
+                        solid_capstyle="round",
+                    )
+                    ax.plot(
+                        [j - 0.28, j + 0.28],
+                        [i + 0.12, i + 0.12],
+                        color="#f4e38c",
+                        linewidth=0.85,
+                        alpha=0.62,
                         solid_capstyle="round",
                     )
 
