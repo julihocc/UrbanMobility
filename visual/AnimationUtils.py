@@ -1,4 +1,6 @@
 from matplotlib import pyplot as plt
+from matplotlib.lines import Line2D
+from matplotlib.patches import Patch
 import numpy as np
 import agentpy as ap
 
@@ -7,6 +9,7 @@ def animation_plot(model, ax, alpha="80"):
     plot_city(model.city, ax, alpha=alpha)
     plot_agents(model.city, ax)
     plot_collisions(model, ax)
+    add_visual_legend(ax)
     """
     for t in range(max(0, model.t - 10), model.t):
         if 'collisions' in model.metrics[t].keys():
@@ -246,15 +249,50 @@ def plot_city(city, ax, alpha="ff"):
     # Colors: black = edge, white = floor, green = goal, blue = agent
     # Original color dict
     color_dict = {
-        s: "#AAAAAA" + alpha,
-        z: "#FFFFFF" + alpha,
-        b: "#708238" + alpha,
-        r: "#333333" + alpha,
-        p: "#57a0d2" + alpha,
+        s: "#efe9dc" + alpha,
+        z: "#f7f3a1" + alpha,
+        b: "#5f7f5b" + alpha,
+        r: "#2f3640" + alpha,
+        p: "#4f6d7a" + alpha,
     }
     # color_dict = {s: '#ffffff'+ alpha, z: '#ffffff'+ alpha, b: '#ffffff'+ alpha, r: '#ffffff'+ alpha, p: '#ffffff' + alpha}
 
     ap.gridplot(grid, ax=ax, color_dict=color_dict, convert=True)
+
+
+def add_visual_legend(ax):
+    handles = [
+        Patch(facecolor="#efe9dc", edgecolor="none", label="Sidewalk"),
+        Patch(facecolor="#2f3640", edgecolor="none", label="Road"),
+        Patch(facecolor="#f7f3a1", edgecolor="none", label="Crosswalk"),
+        Line2D(
+            [],
+            [],
+            marker="o",
+            color="none",
+            markerfacecolor="#f9d65c",
+            markeredgecolor="black",
+            markersize=8,
+            label="Pedestrian",
+        ),
+        Line2D(
+            [],
+            [],
+            marker=">",
+            color="#2b7fff",
+            markerfacecolor="#2b7fff",
+            markersize=8,
+            label="Car",
+        ),
+    ]
+    ax.legend(
+        handles=handles,
+        loc="upper right",
+        fontsize=8,
+        framealpha=0.92,
+        facecolor="white",
+        edgecolor="#666666",
+    )
 
 
 def draw_arrow(ax, dir, pos):
