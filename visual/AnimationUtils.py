@@ -1,6 +1,6 @@
 from matplotlib import pyplot as plt
 from matplotlib.lines import Line2D
-from matplotlib.patches import Patch
+from matplotlib.patches import Patch, Rectangle
 import numpy as np
 import agentpy as ap
 
@@ -246,25 +246,79 @@ def plot_city(city, ax, alpha="ff"):
     ax.set_xlim(-0.5, w - 0.5)
     ax.set_ylim(h - 0.5, -0.5)
     ax.tick_params(axis="both", length=0, labelbottom=False, labelleft=False)
-    # Colors: black = edge, white = floor, green = goal, blue = agent
-    # Original color dict
+    # Google Maps-inspired terrain palette.
     color_dict = {
-        s: "#efe9dc" + alpha,
-        z: "#f7f3a1" + alpha,
-        b: "#5f7f5b" + alpha,
-        r: "#2f3640" + alpha,
-        p: "#4f6d7a" + alpha,
+        s: "#f3efe6" + alpha,
+        z: "#efe4b0" + alpha,
+        b: "#bfd9a7" + alpha,
+        r: "#cfd5db" + alpha,
+        p: "#bcd2ea" + alpha,
     }
-    # color_dict = {s: '#ffffff'+ alpha, z: '#ffffff'+ alpha, b: '#ffffff'+ alpha, r: '#ffffff'+ alpha, p: '#ffffff' + alpha}
 
     ap.gridplot(grid, ax=ax, color_dict=color_dict, convert=True)
+    draw_google_map_overlays(city_grid, ax)
+
+
+def draw_google_map_overlays(city_grid, ax):
+    h, w = city_grid.shape
+    for i in range(h):
+        for j in range(w):
+            cell_code = city_grid[i, j]
+            cell_type = cell_code[0]
+
+            if cell_type in {"r", "t", "l"}:
+                # Subtle street boundary to mimic tiled map roads.
+                ax.add_patch(
+                    Rectangle(
+                        (j - 0.5, i - 0.5),
+                        1,
+                        1,
+                        fill=False,
+                        edgecolor="#ffffff",
+                        linewidth=0.35,
+                        alpha=0.35,
+                    )
+                )
+
+                # Light lane center hints based on available movement directions.
+                dirs = cell_code[1:].strip()
+                if "N" in dirs or "S" in dirs or dirs == "":
+                    ax.plot(
+                        [j, j],
+                        [i - 0.28, i + 0.28],
+                        color="#ffffff",
+                        linewidth=0.8,
+                        alpha=0.55,
+                        solid_capstyle="round",
+                    )
+                if "E" in dirs or "W" in dirs or dirs == "":
+                    ax.plot(
+                        [j - 0.28, j + 0.28],
+                        [i, i],
+                        color="#ffffff",
+                        linewidth=0.8,
+                        alpha=0.55,
+                        solid_capstyle="round",
+                    )
+
+            elif cell_type == "z":
+                # Zebra crossing strokes for immediate pedestrian-zone recognition.
+                for offset in (-0.24, -0.08, 0.08, 0.24):
+                    ax.plot(
+                        [j - 0.38, j + 0.38],
+                        [i + offset, i + offset],
+                        color="#ffffff",
+                        linewidth=1.4,
+                        alpha=0.9,
+                        solid_capstyle="round",
+                    )
 
 
 def add_visual_legend(ax):
     handles = [
-        Patch(facecolor="#efe9dc", edgecolor="none", label="Sidewalk"),
-        Patch(facecolor="#2f3640", edgecolor="none", label="Road"),
-        Patch(facecolor="#f7f3a1", edgecolor="none", label="Crosswalk"),
+        Patch(facecolor="#f3efe6", edgecolor="none", label="Sidewalk"),
+        Patch(facecolor="#cfd5db", edgecolor="none", label="Road"),
+        Patch(facecolor="#efe4b0", edgecolor="none", label="Crosswalk"),
         Line2D(
             [],
             [],
