@@ -109,27 +109,48 @@ def plot_agents(city, ax, show_speed=False, show_id=False):
             )
 
 
-def draw_pedestrian_icon(ax, x, y, scale=1.0, transform=None):
+def draw_pedestrian_icon(
+    ax,
+    x,
+    y,
+    scale=1.0,
+    transform=None,
+    fill_color="#ff7f11",
+    stroke_color="#111111",
+    zorder=6,
+):
     transform = ax.transData if transform is None else transform
     head_r = 0.07 * scale
     ax.add_patch(
         Circle(
             (x, y - 0.08 * scale),
             radius=head_r,
-            facecolor="#ff7f11",
-            edgecolor="#111111",
+            facecolor=fill_color,
+            edgecolor=stroke_color,
             linewidth=0.8,
-            zorder=6,
+            zorder=zorder,
             transform=transform,
         )
     )
-    ax.plot([x, x], [y - 0.01 * scale, y + 0.12 * scale], color="#111111", linewidth=1.35, zorder=6, transform=transform)
-    ax.plot([x - 0.07 * scale, x + 0.07 * scale], [y + 0.04 * scale, y + 0.02 * scale], color="#111111", linewidth=1.2, zorder=6, transform=transform)
-    ax.plot([x, x - 0.06 * scale], [y + 0.12 * scale, y + 0.2 * scale], color="#111111", linewidth=1.2, zorder=6, transform=transform)
-    ax.plot([x, x + 0.06 * scale], [y + 0.12 * scale, y + 0.2 * scale], color="#111111", linewidth=1.2, zorder=6, transform=transform)
+    ax.plot([x, x], [y - 0.01 * scale, y + 0.12 * scale], color=stroke_color, linewidth=1.35, zorder=zorder, transform=transform)
+    ax.plot([x - 0.07 * scale, x + 0.07 * scale], [y + 0.04 * scale, y + 0.02 * scale], color=stroke_color, linewidth=1.2, zorder=zorder, transform=transform)
+    ax.plot([x, x - 0.06 * scale], [y + 0.12 * scale, y + 0.2 * scale], color=stroke_color, linewidth=1.2, zorder=zorder, transform=transform)
+    ax.plot([x, x + 0.06 * scale], [y + 0.12 * scale, y + 0.2 * scale], color=stroke_color, linewidth=1.2, zorder=zorder, transform=transform)
 
 
-def draw_car_icon(ax, x, y, direction, color="#0050c8", active=True, scale=1.0, transform=None):
+def draw_car_icon(
+    ax,
+    x,
+    y,
+    direction,
+    color="#0050c8",
+    active=True,
+    scale=1.0,
+    transform=None,
+    edge_color="#111111",
+    windshield_color="#8ec5ff",
+    zorder=5,
+):
     transform = ax.transData if transform is None else transform
     vertical = direction in {(-1, 0), (1, 0)}
     body_w, body_h = (0.26 * scale, 0.44 * scale) if vertical else (0.44 * scale, 0.26 * scale)
@@ -139,9 +160,9 @@ def draw_car_icon(ax, x, y, direction, color="#0050c8", active=True, scale=1.0, 
         body_w,
         body_h,
         facecolor=body_color,
-        edgecolor="#111111",
+        edgecolor=edge_color,
         linewidth=0.8,
-        zorder=5,
+        zorder=zorder,
         transform=transform,
     )
     ax.add_patch(body)
@@ -153,9 +174,9 @@ def draw_car_icon(ax, x, y, direction, color="#0050c8", active=True, scale=1.0, 
         (wx - win_w / 2, wy - win_h / 2),
         win_w,
         win_h,
-        facecolor="#8ec5ff",
+        facecolor=windshield_color,
         edgecolor="none",
-        zorder=6,
+        zorder=zorder + 1,
         transform=transform,
     )
     ax.add_patch(windshield)
@@ -353,109 +374,130 @@ def draw_google_map_overlays(city_grid, ax):
 
 
 def add_visual_legend(ax):
-    # Draw a custom legend so agent symbols match the exact simulation icons.
-    x0, y0 = 1.02, 0.97
-    width, height = 0.21, 0.30
+    # High-contrast side legend card positioned outside the map viewport.
+    x0, y0 = 1.01, 0.98
+    width, height = 0.24, 0.36
     panel = Rectangle(
         (x0, y0 - height),
         width,
         height,
         transform=ax.transAxes,
-        facecolor="white",
-        edgecolor="#666666",
-        linewidth=0.8,
-        alpha=0.94,
+        facecolor="#111827",
+        edgecolor="#334155",
+        linewidth=1.1,
+        alpha=0.98,
         zorder=20,
         clip_on=False,
     )
     ax.add_patch(panel)
 
+    ax.text(
+        x0 + 0.015,
+        y0 - 0.03,
+        "Legend",
+        transform=ax.transAxes,
+        fontsize=10,
+        fontweight="bold",
+        color="#f8fafc",
+        va="center",
+        zorder=30,
+        clip_on=False,
+    )
+
     rows = [
-        ("Sidewalk", y0 - 0.052),
-        ("Road", y0 - 0.103),
-        ("Crosswalk", y0 - 0.154),
-        ("Pedestrian", y0 - 0.205),
-        ("Car", y0 - 0.256),
+        ("Sidewalk", y0 - 0.085),
+        ("Road", y0 - 0.140),
+        ("Crosswalk", y0 - 0.195),
+        ("Pedestrian", y0 - 0.250),
+        ("Car", y0 - 0.305),
     ]
 
     # Terrain swatches.
     ax.add_patch(
         Rectangle(
-            (x0 + 0.015, rows[0][1] - 0.015),
-            0.038,
-            0.028,
+            (x0 + 0.015, rows[0][1] - 0.017),
+            0.043,
+            0.032,
             transform=ax.transAxes,
             facecolor="#8a8f98",
-            edgecolor="none",
-            zorder=21,
+            edgecolor="#e2e8f0",
+            linewidth=0.4,
+            zorder=25,
             clip_on=False,
         )
     )
     ax.add_patch(
         Rectangle(
-            (x0 + 0.015, rows[1][1] - 0.015),
-            0.038,
-            0.028,
+            (x0 + 0.015, rows[1][1] - 0.017),
+            0.043,
+            0.032,
             transform=ax.transAxes,
             facecolor="#0f1115",
-            edgecolor="none",
-            zorder=21,
+            edgecolor="#e2e8f0",
+            linewidth=0.4,
+            zorder=25,
             clip_on=False,
         )
     )
     ax.add_patch(
         Rectangle(
-            (x0 + 0.015, rows[2][1] - 0.015),
-            0.038,
-            0.028,
+            (x0 + 0.015, rows[2][1] - 0.017),
+            0.043,
+            0.032,
             transform=ax.transAxes,
             facecolor="#181a1f",
-            edgecolor="none",
-            zorder=21,
+            edgecolor="#e2e8f0",
+            linewidth=0.4,
+            zorder=25,
             clip_on=False,
         )
     )
-    for stripe_y in (-0.012, -0.006, 0.0, 0.006):
+    for stripe_y in (-0.012, -0.004, 0.004, 0.012):
         ax.plot(
-            [x0 + 0.017, x0 + 0.051],
+            [x0 + 0.017, x0 + 0.055],
             [rows[2][1] + stripe_y, rows[2][1] + stripe_y],
             transform=ax.transAxes,
-            color="white",
-            linewidth=1.2,
-            zorder=22,
+            color="#ffffff",
+            linewidth=1.3,
+            zorder=26,
             clip_on=False,
         )
 
-    # Agent icons (same drawing functions as simulation).
     draw_pedestrian_icon(
         ax,
-        x0 + 0.034,
-        rows[3][1] - 0.002,
-        scale=0.21,
+        x0 + 0.037,
+        rows[3][1],
+        scale=0.20,
         transform=ax.transAxes,
+        fill_color="#f97316",
+        stroke_color="#ffffff",
+        zorder=30,
     )
     draw_car_icon(
         ax,
-        x0 + 0.034,
-        rows[4][1] - 0.002,
-        (0, 1),
-        color="#00a8ff",
+        x0 + 0.037,
+        rows[4][1],
+        (-1, 0),
+        color="#2563eb",
         active=True,
-        scale=0.20,
+        scale=0.12,
         transform=ax.transAxes,
+        edge_color="#ffffff",
+        windshield_color="#93c5fd",
+        zorder=30,
     )
 
     for label, y in rows:
         ax.text(
-            x0 + 0.055,
+            x0 + 0.068,
             y,
             label,
             transform=ax.transAxes,
             fontsize=9,
             fontweight="bold",
-            color="#111111",
+            color="#f8fafc",
             va="center",
-            zorder=22,
+            zorder=30,
             clip_on=False,
         )
 
